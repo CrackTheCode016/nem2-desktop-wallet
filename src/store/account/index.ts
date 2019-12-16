@@ -103,10 +103,10 @@ const mutations: MutationTree<StoreAccount> = {
     const namespacesNotUpdated = namespacesToUpdate
       .filter(({hex}) => namespaces.find(ns => ns.hex === hex) === undefined)
 
-    state.namespaces = [...namespacesNotUpdated, ...updatedNamespaces]
+    state.namespaces = [ ...namespacesNotUpdated, ...updatedNamespaces ]
   },
   ADD_NAMESPACE_FROM_RECIPIENT_ADDRESS(state: StoreAccount, namespaces: AppNamespace[]) {
-    state.namespaces = [...state.namespaces, ...namespaces]
+    state.namespaces = [ ...state.namespaces, ...namespaces ]
   },
   SET_NODE(state: StoreAccount, node: string): void {
     state.node = node
@@ -196,12 +196,12 @@ const mutations: MutationTree<StoreAccount> = {
       .findIndex(({rawTx}) => rawTx.transactionInfo.hash === transaction.rawTx.transactionInfo.hash)
 
     if (index > -1) return
-    state.transactionsToCosign = [transaction, ...oldTransactions]
+    state.transactionsToCosign = [ transaction, ...oldTransactions ]
   },
   UPDATE_TRANSACTION_TO_COSIGN(state: StoreAccount, newTransaction: FormattedTransaction) {
     const {hash} = newTransaction.rawTx.transactionInfo
     const transactions = popTransactionToCosignByHash([...state.transactionsToCosign], hash)
-    state.transactionsToCosign = [newTransaction, ...transactions]
+    state.transactionsToCosign = [ newTransaction, ...transactions ]
   },
 }
 

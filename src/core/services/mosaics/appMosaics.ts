@@ -143,6 +143,6 @@ export const AppMosaics = () => ({
 
     const appMosaics = namespacesWithAlias.map(namespace => AppMosaic.fromNamespace(namespace))
 
-    return [...unBoundMosaics, ...appMosaics]
+    return [ ...unBoundMosaics, ...appMosaics ]
   },
 })

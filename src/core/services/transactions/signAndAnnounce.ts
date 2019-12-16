@@ -19,7 +19,7 @@ export const signAndAnnounce = async ({ transaction, store, lockParams }: {
   transaction: Transaction
   store: Store<AppState>
   lockParams?: LockParams}):
-    Promise<SignTransaction> => {
+Promise<SignTransaction> => {
 
   // stage the transaction data in the store, causing the UI to be blocked
   const stagedTransaction: StagedTransaction = {

@@ -106,7 +106,7 @@ export class Listeners {
 
   private retry() {
     this.stop()
-    this.restartTimes++
+    this.restartTimes ++
     this.start()
   }
 }

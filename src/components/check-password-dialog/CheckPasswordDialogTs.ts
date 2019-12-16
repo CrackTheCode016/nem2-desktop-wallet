@@ -15,10 +15,10 @@ export class CheckPasswordDialogTs extends Vue {
   password = ''
 
   @Prop({default: false})
-    visible: boolean
+  visible: boolean
 
   @Prop({default: false})
-    returnPassword: boolean
+  returnPassword: boolean
 
   get show(): boolean {
     return this.visible

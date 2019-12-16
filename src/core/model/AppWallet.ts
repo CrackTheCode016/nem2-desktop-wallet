@@ -248,7 +248,7 @@ export class AppWallet {
       localSave('accountMap', JSON.stringify(accountMap))
       return
     }
-    const updateWalletList = localData.length ? [...localData, this] : [this]
+    const updateWalletList = localData.length ? [ ...localData, this ] : [this]
     accountMap[accountName].wallets = updateWalletList
 
     store.commit('SET_WALLET_LIST', updateWalletList)

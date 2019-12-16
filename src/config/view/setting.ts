@@ -5,7 +5,7 @@ import dashboardPointAmount from '@/common/img/monitor/dash-board/dashboardPoint
 import dashboardTransactionAmount from '@/common/img/monitor/dash-board/dashboardTransactionAmount.png'
 import dashboardPublicKey from '@/common/img/monitor/dash-board/dashboardPublicKey.png'
 
-export const settingNetworkColorConfig = ['green_point', 'pink_point', 'purple_point', 'yellow_point']
+export const settingNetworkColorConfig = [ 'green_point', 'pink_point', 'purple_point', 'yellow_point' ]
 
 export const settingNetworkPointConfig: Array<{
   name: string

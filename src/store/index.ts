@@ -11,5 +11,5 @@ export default new Vuex.Store({
     app: {...appState, ...appMutations, ...appActions},
     account: {...accountState, ...accountMutations, ...accountActions},
   },
-  plugins: [appMosaicsModule, onTransactionRefreshModule],
+  plugins: [ appMosaicsModule, onTransactionRefreshModule ],
 })

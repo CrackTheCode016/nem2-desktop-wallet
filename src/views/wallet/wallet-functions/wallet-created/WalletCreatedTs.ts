@@ -29,7 +29,7 @@ export class WalletCreatedTs extends Vue {
   }
 
   @Prop({default: {}})
-    createForm: any
+  createForm: any
 
 
   get mnemonic() {
@@ -91,20 +91,20 @@ export class WalletCreatedTs extends Vue {
 
   changeTabs(index) {
     switch (index) {
-    case 0:
-      this.tags = index
-      break
-    case 1:
-      this.mnemonicRandomArr = randomizeMnemonicWordArray([...this.mnemonic])
-      this.tags = index
-      break
-    case 2:
-      if (!this.checkMnemonic()) 
-      {return}
+      case 0:
+        this.tags = index
+        break
+      case 1:
+        this.mnemonicRandomArr = randomizeMnemonicWordArray([...this.mnemonic])
+        this.tags = index
+        break
+      case 2:
+        if (!this.checkMnemonic()) 
+        {return}
       
-      this.createFromMnemonic()
-      this.tags = index
-      break
+        this.createFromMnemonic()
+        this.tags = index
+        break
     }
   }
 

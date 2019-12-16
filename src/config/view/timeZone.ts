@@ -5,7 +5,7 @@ export const timeZoneListData = (() => {
       label: 'GMT',
     },
   ]
-  for (let i = 1; i <= 12; i++) {
+  for (let i = 1; i <= 12; i ++) {
     list.push({
       value: i,
       label: `GMT+${i}`,

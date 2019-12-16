@@ -21,13 +21,13 @@ export const fetchSelfAndChildrenPartialTransactions = (
 ): void => {
   const {address} = publicAccount
   const multisigInfo = store.state.account.multisigAccountInfo[address.plain()]
-  const publicAccountsToFetch = multisigInfo ? [publicAccount, ...multisigInfo.multisigAccounts] : [publicAccount]
+  const publicAccountsToFetch = multisigInfo ? [ publicAccount, ...multisigInfo.multisigAccounts ] : [publicAccount]
 
   zip(
     interval(500).pipe(take(publicAccountsToFetch.length)),
     from(publicAccountsToFetch.map(x => x.publicKey)),
   )
-    .pipe(map(([, x]) => x))
+    .pipe(map(([ , x ]) => x))
     .subscribe(
       async publicKey => {
         try {

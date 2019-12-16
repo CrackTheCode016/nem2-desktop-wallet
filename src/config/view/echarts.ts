@@ -28,8 +28,8 @@ export const echarts = {
             show: true,
           },
         },
-        edgeSymbol: ['none', 'arrow'],
-        edgeSymbolSize: [4, 10],
+        edgeSymbol: [ 'none', 'arrow' ],
+        edgeSymbolSize: [ 4, 10 ],
         edgeLabel: {
           normal: {
             textStyle: {
@@ -57,7 +57,7 @@ export const echarts = {
       trigger: 'item',
       formatter: '{a} <br/>{b} : {c} ({d}%)',
     },
-    color: ['#EC5447', '#F1C850'],
+    color: [ '#EC5447', '#F1C850' ],
     series: [
       {
         name: 'vote',

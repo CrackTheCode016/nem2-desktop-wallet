@@ -4,7 +4,7 @@ declare const window: any
 export const openFile = fn => {
   const electron = window.electron
   electron.dialog.showOpenDialog({
-    properties: ['openFile', 'openDirectory'],
+    properties: [ 'openFile', 'openDirectory' ],
   }, files => {
     if (files) 
     {fn(files)}

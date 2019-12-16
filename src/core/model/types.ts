@@ -62,12 +62,12 @@ export interface StoreAccount {
   multisigAccountInfo: Record<string, MultisigAccountInfo>
   transactionsToCosign: FormattedTransaction[]
   activeWalletAddress: string
-    /**
+  /**
      *  The network currency, to be used for fees management,
      *  formatting, defaulting...
      */
   networkCurrency: NetworkCurrency
-    /**
+  /**
      * This property is ONLY for mosaic list initialization purposes
      */
   networkMosaics: Record<string, AppMosaic>
@@ -133,36 +133,36 @@ export interface Endpoint {
 }
 
 export enum ANNOUNCE_TYPES {
-    NORMAL = 'NORMAL',
-    AGGREGATE_BONDED = 'AGGREGATE_BONDED',
-    AGGREGATE_COMPLETE = 'AGGREGATE_COMPLETE',
+  NORMAL = 'NORMAL',
+  AGGREGATE_BONDED = 'AGGREGATE_BONDED',
+  AGGREGATE_COMPLETE = 'AGGREGATE_COMPLETE',
 }
 
 export enum MULTISIG_FORM_MODES {
-    CONVERSION = 'CONVERSION',
-    MODIFICATION = 'MODIFICATION',
+  CONVERSION = 'CONVERSION',
+  MODIFICATION = 'MODIFICATION',
 }
 
 export enum TRANSACTIONS_CATEGORIES {
-    NORMAL = 'NORMAL',
-    MULTISIG = 'MULTISIG',
-    TO_COSIGN = 'TO_COSIGN',
+  NORMAL = 'NORMAL',
+  MULTISIG = 'MULTISIG',
+  TO_COSIGN = 'TO_COSIGN',
 }
 
 export enum RECIPIENT_TYPES {
-    ADDRESS = 'ADDRESS',
-    ALIAS = 'ALIAS',
-    PUBLIC_KEY = 'PUBLIC_KEY',
+  ADDRESS = 'ADDRESS',
+  ALIAS = 'ALIAS',
+  PUBLIC_KEY = 'PUBLIC_KEY',
 }
 
 export enum BindTypes {
-    ADDRESS = 'ADDRESS',
-    MOSAIC = 'MOSAIC',
+  ADDRESS = 'ADDRESS',
+  MOSAIC = 'MOSAIC',
 }
 
 export enum AddOrRemove {
-    ADD = 'ADD',
-    REMOVE = 'REMOVE',
+  ADD = 'ADD',
+  REMOVE = 'REMOVE',
 }
 
 export interface ValidationObject {
@@ -173,13 +173,13 @@ export interface ValidationObject {
  * These keys will be handled in a specific way by the transaction info template component
  */
 export enum SpecialTxDetailsKeys {
-    mosaics = 'mosaics',
-    namespace = 'namespace',
-    cosignatories = 'cosignatories',
-    from = 'from',
-    aims = 'aims',
-    hash = 'hash',
-    cosigned_by = 'cosigned_by',
+  mosaics = 'mosaics',
+  namespace = 'namespace',
+  cosignatories = 'cosignatories',
+  from = 'from',
+  aims = 'aims',
+  hash = 'hash',
+  cosigned_by = 'cosigned_by',
 }
 
 export interface BlocksAndTime {

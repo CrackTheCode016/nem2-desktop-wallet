@@ -47,7 +47,7 @@ export class WalletDetailsTs extends Vue {
   showMnemonicDialog = false
   showKeystoreDialog = false
   showPrivatekeyDialog = false
-  functionShowList = [false, true]
+  functionShowList = [ false, true ]
   showBindDialog = false
   bind = true
   fromNamespace = false
@@ -112,7 +112,7 @@ export class WalletDetailsTs extends Vue {
   }
 
   showFunctionIndex(index) {
-    this.functionShowList = [false, false, false]
+    this.functionShowList = [ false, false, false ]
     this.functionShowList[index] = true
   }
 

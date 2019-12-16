@@ -3,10 +3,10 @@ import {localRead, localSave} from '.'
 export const saveLocalAlias = (
   address: string,
   aliasObject: {
-      tag: string
-      alias: string
-      address: string
-    }) => {
+    tag: string
+    alias: string
+    address: string
+  }) => {
   const addressBookData = localRead('addressBook')
   const addressBook = addressBookData ? JSON.parse(addressBookData) : {}
   addressBook[address] = addressBook[address] || {}

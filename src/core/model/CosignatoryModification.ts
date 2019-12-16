@@ -16,7 +16,7 @@ export class CosignatoryModifications {
     const modificationsWithoutDuplicate = [...this.modifications]
       .filter(({cosignatory}) => cosignatory.publicKey !== cosignatoryModification.cosignatory.publicKey)
 
-    this.modifications = [...modificationsWithoutDuplicate, cosignatoryModification]
+    this.modifications = [ ...modificationsWithoutDuplicate, cosignatoryModification ]
   }
 
   get publicKeysAdditions(): PublicAccount[] {

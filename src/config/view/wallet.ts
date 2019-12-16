@@ -85,5 +85,5 @@ export const serviceSwitchFnConfig = [
   },
 ]
 
-export const fourStepsPictureList = [step1Of4, step2Of4, step3Of4, step4Of4]
-export const threeStepsPictureList = [step1Of3, step2Of3, step3Of3]
+export const fourStepsPictureList = [ step1Of4, step2Of4, step3Of4, step4Of4 ]
+export const threeStepsPictureList = [ step1Of3, step2Of3, step3Of3 ]
