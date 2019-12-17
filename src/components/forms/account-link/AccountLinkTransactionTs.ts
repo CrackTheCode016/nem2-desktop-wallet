@@ -4,20 +4,20 @@ import {mapState} from "vuex"
 import {StoreAccount, DefaultFee, AppWallet} from '@/core/model'
 import {cloneData, getAbsoluteMosaicAmount} from '@/core/utils'
 import {formDataConfig, DEFAULT_FEES, FEE_GROUPS} from '@/config'
-import {signTransaction} from '@/core/services/transactions'
+import {signAndAnnounce} from '@/core/services/transactions'
 import DisabledForms from '@/components/disabled-forms/DisabledForms.vue'
-import CheckPasswordDialog from '@/components/check-password-dialog/CheckPasswordDialog.vue'
 
 @Component({
     computed: {
-      ...mapState({
-        activeAccount: 'account',
-      })
+        ...mapState({
+            activeAccount: 'account',
+        })
     },
-    components:{ DisabledForms, CheckPasswordDialog }
-  })
+    components: {DisabledForms}
+})
 export class AccountLinkTransactionTs extends Vue {
     activeAccount: StoreAccount
+    signAndAnnounce = signAndAnnounce
     formItems = cloneData(formDataConfig.remoteForm)
     showCheckPWDialog = false
     newRemoteAccount: Account = null
@@ -26,7 +26,7 @@ export class AccountLinkTransactionTs extends Vue {
     visible: boolean
 
     get show(): boolean {
-      return this.visible
+        return this.visible
     }
 
     set show(val) {
@@ -82,23 +82,13 @@ export class AccountLinkTransactionTs extends Vue {
         )
     }
 
-    async signAndAnnounce() {
+    signTransaction() {
         try {
             this.$emit('close')
-            const transaction = this.getTransaction()
-
-            const {
-                success,
-                signedTransaction,
-            } = await signTransaction({
-                transaction,
+            this.signAndAnnounce({
+                transaction: this.getTransaction(),
                 store: this.$store,
             })
-
-            if (success) {
-                const { node } = this.activeAccount
-                new AppWallet(this.wallet).announceTransaction(signedTransaction, node, this.$root)
-            }
         } catch (error) {
             console.error("AccountLinkTransactionTs -> submit -> error", error)
         }
@@ -106,10 +96,10 @@ export class AccountLinkTransactionTs extends Vue {
 
     submit() {
         this.$validator
-        .validate()
-        .then((valid) => {
-          if (!valid) return
-          this.signAndAnnounce()
-        })
+            .validate()
+            .then((valid) => {
+                if (!valid) return
+                this.signTransaction()
+            })
     }
 }

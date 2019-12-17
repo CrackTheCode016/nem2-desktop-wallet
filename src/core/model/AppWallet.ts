@@ -1,11 +1,9 @@
 import {Store} from 'vuex'
 import {
     Account,
-    Crypto,
     NetworkType,
     SimpleWallet,
     Password,
-    WalletAlgorithm,
     Listener,
     AccountHttp,
     Address,
@@ -20,14 +18,18 @@ import {
     UInt64,
     EncryptedPrivateKey,
     PersistentDelegationRequestTransaction,
+    MultisigHttp,
+    PublicAccount,
 } from 'nem2-sdk'
 import CryptoJS from 'crypto-js'
 import {filter, mergeMap} from 'rxjs/operators'
 import {Message, networkConfig, defaultNetworkConfig} from "@/config"
-import {localRead, localSave, createSubWalletByPathNumber, getPath} from "@/core/utils"
+import {localRead, localSave, getAccountFromPathNumber, getPath} from "@/core/utils"
 import {AppAccounts, CreateWalletType} from "@/core/model"
 import {AppState, RemoteAccount} from './types'
 import {Log} from './Log'
+import {Notice, NoticeType} from './Notice'
+
 const {DEFAULT_LOCK_AMOUNT} = defaultNetworkConfig
 const {EMPTY_LINKED_ACCOUNT_KEY} = networkConfig
 
@@ -52,10 +54,6 @@ export class AppWallet {
     importance: number
     linkedAccountKey: string
     remoteAccount: RemoteAccount | null
-
-    generateWalletTitle(createType: string, coinType: string, netType: string) {
-        return `${createType}-${coinType}-${netType}`
-    }
 
     createFromPrivateKey(name: string,
                          password: Password,
@@ -82,12 +80,14 @@ export class AppWallet {
         password: Password,
         pathNumber: number,
         networkType: NetworkType,
-        store: Store<AppState>): AppWallet {
+        store: Store<AppState>,
+        balance?: number
+    ): AppWallet {
         try {
-            const accountName = store.state.account.accountName
-            let accountMap = localRead('accountMap') === '' ? {} : JSON.parse(localRead('accountMap'))
+            const accountName = store.state.account.currentAccount.name
+            const accountMap = localRead('accountMap') === '' ? {} : JSON.parse(localRead('accountMap'))
             const mnemonic = AppAccounts().decryptString(accountMap[accountName].seed, password.value)
-            const account = createSubWalletByPathNumber(mnemonic, pathNumber)
+            const account = getAccountFromPathNumber(mnemonic, pathNumber, networkType)
             this.simpleWallet = SimpleWallet.createFromPrivateKey(name, password, account.privateKey, networkType)
             this.name = name
             this.address = this.simpleWallet.address.plain()
@@ -97,6 +97,7 @@ export class AppWallet {
             this.path = getPath(pathNumber)
             this.sourceType = CreateWalletType.seed
             this.encryptedMnemonic = AppAccounts().encryptString(mnemonic, password.value)
+            this.balance = balance || 0
             this.addNewWalletToList(store)
             return this
         } catch (error) {
@@ -105,7 +106,6 @@ export class AppWallet {
         }
     }
 
-    // TODO USE ACCOUNT NETWORK TYPE
     createFromMnemonic(
         name: string,
         password: Password,
@@ -113,9 +113,9 @@ export class AppWallet {
         networkType: NetworkType,
         store: Store<AppState>): AppWallet {
         try {
-            const accountName = store.state.account.accountName
+            const accountName = store.state.account.currentAccount.name
             const accountMap = localRead('accountMap') === '' ? {} : JSON.parse(localRead('accountMap'))
-            const account = createSubWalletByPathNumber(mnemonic, 0)
+            const account = getAccountFromPathNumber(mnemonic, 0, networkType)
             this.simpleWallet = SimpleWallet.createFromPrivateKey(name, password, account.privateKey, networkType)
             this.name = name
             this.address = this.simpleWallet.address.plain()
@@ -129,6 +129,20 @@ export class AppWallet {
             localSave('accountMap', JSON.stringify(accountMap))
             this.addNewWalletToList(store)
             return this
+        } catch (error) {
+            throw new Error(error)
+        }
+    }
+
+    createAccountFromMnemonic(
+        password: Password,
+        mnemonic: string,
+        store: Store<AppState>) {
+        try {
+            const accountName = store.state.account.currentAccount.name
+            const accountMap = localRead('accountMap') === '' ? {} : JSON.parse(localRead('accountMap'))
+            accountMap[accountName].seed = AppAccounts().encryptString(mnemonic, password.value)
+            localSave('accountMap', JSON.stringify(accountMap))
         } catch (error) {
             throw new Error(error)
         }
@@ -192,17 +206,8 @@ export class AppWallet {
             const _password = new Password(password)
             const {encryptedKey, iv} = this.remoteAccount.simpleWallet.encryptedPrivateKey
             return new EncryptedPrivateKey(encryptedKey, iv).decrypt(_password).toUpperCase()
-        } catch(error) {
-            throw new Error(error)
-        }
-    }
-
-    getMnemonic(password: Password): string {
-        if (this.encryptedMnemonic === undefined) throw new Error('This wallet has no encrypted mnemonic')
-        try {
-            return AppAccounts().decryptString(this.encryptedMnemonic, password.value)
         } catch (error) {
-            throw new Error('Could not decrypt the mnemonic')
+            throw new Error(error)
         }
     }
 
@@ -230,7 +235,7 @@ export class AppWallet {
     }
 
     addNewWalletToList(store: Store<AppState>): void {
-        const accountName = store.state.account.accountName
+        const accountName = store.state.account.currentAccount.name
         const accountMap = localRead('accountMap') === ''
             ? {} : JSON.parse(localRead('accountMap'))
         const newActiveWalletAddress = this.address
@@ -253,7 +258,7 @@ export class AppWallet {
 
     delete(store: Store<AppState>, that: any) {
         const list = [...store.state.app.walletList]
-        const accountName = store.state.account.accountName
+        const accountName = store.state.account.currentAccount.name
         const accountMap = localRead('accountMap') === ''
             ? {} : JSON.parse(localRead('accountMap'))
 
@@ -276,13 +281,12 @@ export class AppWallet {
         that.$Notice.success({
             title: that['$t']('Delete_wallet_successfully') + '',
         })
-        // this.$emit('hasWallet')
     }
 
 
     static updateActiveWalletAddress(newActiveWalletAddress: string, store: Store<AppState>) {
         const walletList = store.state.app.walletList
-        const accountName = store.state.account.accountName
+        const accountName = store.state.account.currentAccount.name
         const accountMap = localRead('accountMap') === ''
             ? {} : JSON.parse(localRead('accountMap'))
 
@@ -317,13 +321,13 @@ export class AppWallet {
     }
 
     /**
-     * @param password 
+     * @param password
      * @param privateKey false in the case of new account creation
-     * @param store 
+     * @param store
      */
-    createAndStoreRemoteAccount(  password: string,
-                                                privateKey: string | false,
-                                                store: Store<AppState>
+    createAndStoreRemoteAccount(password: string,
+                                privateKey: string | false,
+                                store: Store<AppState>
     ): string {
         if (!this.checkPassword(password)) throw new Error('The password does not match the wallet password')
         const _password = new Password(password)
@@ -334,7 +338,7 @@ export class AppWallet {
 
         const {publicKey} = account
         const _privateKey = account.privateKey
-        if(this.linkedAccountKey && this.linkedAccountKey !== publicKey) {
+        if (this.linkedAccountKey && this.linkedAccountKey !== publicKey) {
             throw new Error('The public key is not matching the current linked account key')
         }
 
@@ -343,33 +347,18 @@ export class AppWallet {
             simpleWallet: SimpleWallet
                 .createFromPrivateKey('remote account', _password, _privateKey, this.networkType),
         }
-        
+
         this.updateWallet(store)
         return _privateKey
     }
 
-    updateWalletName(
-        accountName: string,
-        newWalletName: string,
-        walletAddress: string,
-        store: Store<AppState>
-    ) {
-        let accountMap = JSON.parse(localRead('accountMap'))
-        accountMap[accountName]['wallets'].every((item, index) => {
-            if (item.address == walletAddress) {
-                accountMap[accountName]['wallets'][index].name = newWalletName
-                return false
-            }
-            return true
-        })
-
-        localSave('accountMap', JSON.stringify(accountMap))
-        store.commit('SET_WALLET_LIST', accountMap[accountName]['wallets'])
+    updateWalletName( newWalletName: string, store: Store<AppState> ) {
+        this.name = newWalletName
+        this.updateWallet(store)
     }
 
-
     updateWallet(store: Store<AppState>) {
-        const accountName = store.state.account.accountName
+        const accountName = store.state.account.currentAccount.name
         const accountMap = localRead('accountMap') === '' ? {} : JSON.parse(localRead('accountMap'))
         const localData: any[] = accountMap[accountName].wallets
         if (!localData.length) throw new Error('error at update wallet, no wallets in storage')
@@ -387,7 +376,7 @@ export class AppWallet {
 
     async setMultisigStatus(node: string, store: Store<AppState>): Promise<void> {
         try {
-            const multisigAccountInfo = await new AccountHttp(node)
+            const multisigAccountInfo = await new MultisigHttp(node)
                 .getMultisigAccountInfo(Address.createFromRawAddress(this.address)).toPromise()
             store.commit('SET_MULTISIG_ACCOUNT_INFO', {address: this.address, multisigAccountInfo})
             store.commit('SET_MULTISIG_LOADING', false)
@@ -401,80 +390,70 @@ export class AppWallet {
         return this.linkedAccountKey && this.linkedAccountKey !== EMPTY_LINKED_ACCOUNT_KEY
     }
 
+    /**
+     * Routes a signedTransaction to the relevant announce method
+     * @param signedTransaction 
+     * @param store 
+     * @param signedLock 
+     */
     announceTransaction(
         signedTransaction: SignedTransaction | CosignatureSignedTransaction,
-        node: string,
-        that: any,
+        store: Store<AppState>,
         signedLock?: SignedTransaction,
-    ): void {
+        ): void {
         if (signedTransaction instanceof CosignatureSignedTransaction) {
-            this.announceCosignature(signedTransaction, node, that)
+            this.announceCosignature(signedTransaction, store)
             return
         }
 
         if (signedLock) {
-            this.announceBonded(signedTransaction, signedLock, node, that)
+            this.announceBonded(signedTransaction, signedLock, store)
             return
         }
 
-        this.announceNormal(signedTransaction, node, that)
+        this.announceNormal(signedTransaction, store)
     }
 
-    announceCosignature(signedTransaction: CosignatureSignedTransaction, node: string, that: any): void {
-        const message = that.$t(Message.SUCCESS)
-        new Log('announceCosignature', signedTransaction).create(that.$store)
+    announceCosignature(signedTransaction: CosignatureSignedTransaction, store: Store<AppState>): void {
+        const {node} = store.state.account
+        Log.create('announceCosignature', signedTransaction, store)
 
         new TransactionHttp(node).announceAggregateBondedCosignature(signedTransaction).subscribe(
-            _ => {
-                that.$store.commit('POP_TRANSACTION_TO_COSIGN_BY_HASH', {
-                    publicKey: signedTransaction.signerPublicKey,
-                    hash: signedTransaction.parentHash,
-                })
-                that.$Notice.success({title: message})
+            (_) => {
+                store.commit('POP_TRANSACTION_TO_COSIGN_BY_HASH', signedTransaction.parentHash)
+                Notice.trigger(Message.SUCCESS, NoticeType.success, store)
             },
-            (error) => {
-                new Log('announceNormal -> error', error).create(that.$store)
-                console.error('announceNormal -> error', error)
-            },
+            error => Log.create('announceCosignature -> error', error, store),
         )
     }
 
-    announceNormal(signedTransaction: SignedTransaction, node: string, that: any): void {
-        const message = that.$t(Message.SUCCESS)
-        new Log('announceNormal', signedTransaction).create(that.$store)
+    announceNormal(signedTransaction: SignedTransaction, store: Store<AppState>): void {
+        const {node} = store.state.account
+        Log.create('announceNormal', signedTransaction, store)
+
         new TransactionHttp(node).announce(signedTransaction).subscribe(
-            _ => that.$Notice.success({title: message}),
-            error => console.error('announceNormal -> error', error),
+            _ => Notice.trigger(Message.SUCCESS, NoticeType.success, store),
+            error => Log.create('announceNormal -> error', error, store),
         )
     }
 
-    signAndAnnounceNormal(password: Password, node: string, generationHash: string, transactionList: Array<any>, that: any): void {
-        const account = this.getAccount(password)
-        const signature = account.sign(transactionList[0], generationHash)
-        const message = that.$t(Message.SUCCESS)
-        new Log('signAndAnnounceNormal', signature).create(that.$store)
-
-        new TransactionHttp(node).announce(signature).subscribe(
-            _ => that.$Notice.success({title: message}),
-            (error) => {
-                new Log('signAndAnnounceNormal -> error', error).create(that.$store)
-                console.error('signAndAnnounceNormal -> error', error)
-            }
-        )
-    }
-
-    announceBonded(signedTransaction: SignedTransaction, signedLock: SignedTransaction, node: string, that): void {
+    announceBonded(
+        signedTransaction: SignedTransaction,
+        signedLock: SignedTransaction,
+        store: Store<AppState>,
+    ): void {
+        const {node} = store.state.account
         const transactionHttp = new TransactionHttp(node)
         const listener = new Listener(node.replace('http', 'ws'), WebSocket)
-        const message = that.$t(Message.SUCCESS)
-        new Log('signedTransaction', { signedTransaction, signedLock }).create(that.$store)
+        Log.create('announceBonded', {signedTransaction, signedLock}, store)
 
-        listener.open().then(() => {
+        listener.open().then(() => new Promise((resolve, reject) => {
             transactionHttp
                 .announce(signedLock)
-                .subscribe(x => console.log(x), error => {
-                    throw new Error(error)
-                })
+                .subscribe(
+                    (_) =>  Notice.trigger(Message.SUCCESS, NoticeType.success, store),
+                    error =>  reject(error),
+                )
 
             listener
                 .confirmed(Address.createFromRawAddress(this.address))
@@ -484,59 +463,33 @@ export class AppWallet {
                     mergeMap(_ => transactionHttp.announceAggregateBonded(signedTransaction)),
                 )
                 .subscribe(
-                    (_) => {
-                        that.$Notice.success({title: message})
-                    },
-                    error => {
-                        throw new Error(error)
-                    },
+                    _ => Notice.trigger(Message.SUCCESS, NoticeType.success, store),
+                    error => reject(error),
                 )
-        }).catch((error) => {
-            new Log('announceBonded -> error', { signedTransaction, signedLock }).create(that.$store)
-            console.error('announceBonded -> error', error)
+        })).catch((error) => {
+            Log.create('announceBonded -> error', error, store)
         })
-    }
-
-    // @TODO: review
-    // Remove if CheckPasswordDialog is made redundant
-    signAndAnnounceBonded = (password: Password,
-                             lockFee: number,
-                             transactions: AggregateTransaction[],
-                             store: Store<AppState>,
-                             that,) => {
-        const {node} = store.state.account
-
-        const {signedTransaction, signedLock} = this.getSignedLockAndAggregateTransaction(
-            transactions[0],
-            lockFee,
-            password.value,
-            store,
-        )
-
-        this.announceBonded(signedTransaction, signedLock, node, that)
     }
 
     getSignedLockAndAggregateTransaction(
         aggregateTransaction: AggregateTransaction,
         fee: number,
         password: string,
-        store: Store<AppState>):
-        {
+        store: Store<AppState>): {
             signedTransaction: SignedTransaction,
             signedLock: SignedTransaction,
         } {
         const account = this.getAccount(new Password(password))
-        const {wallet, networkCurrency, generationHash} = store.state.account
-        const {networkType} = wallet
-
+        const {networkCurrency, generationHash} = store.state.account
         const signedTransaction = account.sign(aggregateTransaction, generationHash)
+
         const hashLockTransaction = HashLockTransaction
             .create(
                 Deadline.create(),
                 new Mosaic(new MosaicId(networkCurrency.hex), UInt64.fromUint(DEFAULT_LOCK_AMOUNT)),
                 UInt64.fromUint(480),
                 signedTransaction,
-                networkType,
+                this.networkType,
                 UInt64.fromUint(fee)
             )
         return {
@@ -555,18 +508,22 @@ export class AppWallet {
             const _password = new Password(password)
             const delegatedPrivateKey = this.getRemoteAccountPrivateKey(password)
             const accountPrivateKey = this.getAccount(_password).privateKey
-    
+
             return PersistentDelegationRequestTransaction
                 .createPersistentDelegationRequestTransaction(
-                        deadline,
-                        delegatedPrivateKey,
-                        recipientPublicKey,
-                        accountPrivateKey,
-                        this.networkType,
-                        feeAmount,
-                    );
+                    deadline,
+                    delegatedPrivateKey,
+                    recipientPublicKey,
+                    accountPrivateKey,
+                    this.networkType,
+                    feeAmount,
+                );
         } catch (error) {
             throw new Error(error)
         }
+    }
+
+    get publicAccount(): PublicAccount {
+        return PublicAccount.createFromPublicKey(this.publicKey, this.networkType)
     }
 }

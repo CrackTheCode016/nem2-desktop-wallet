@@ -1,17 +1,21 @@
 import {mapState} from 'vuex'
 import {Component, Vue, Watch} from 'vue-property-decorator'
-import {formatNumber, localRead, getPath} from '@/core/utils'
+import {formatNumber, localRead} from '@/core/utils'
 import {AppWallet, AppInfo, StoreAccount} from "@/core/model"
 import {CreateWalletType} from "@/core/model/CreateWalletType"
 import {seedWalletTitle, walletStyleSheetType} from '@/config/view/wallet.ts'
 import {MultisigAccountInfo, Password} from 'nem2-sdk'
 import {Message, networkConfig} from "@/config"
-import TheWalletUpdate from "@/views/wallet/wallet-switch/the-wallet-update/TheWalletUpdate.vue"
 import CheckPasswordDialog from '@/components/check-password-dialog/CheckPasswordDialog.vue'
 import TheWalletDelete from '@/views/wallet/wallet-switch/the-wallet-delete/TheWalletDelete.vue'
+import MnemonicDialog from '@/views/wallet/wallet-details/mnemonic-dialog/MnemonicDialog.vue'
 
 @Component({
-    components: {TheWalletDelete, TheWalletUpdate, CheckPasswordDialog},
+    components: {
+        TheWalletDelete,
+        MnemonicDialog,
+        CheckPasswordDialog
+    },
     computed: {
         ...mapState({
             activeAccount: 'account',
@@ -23,17 +27,15 @@ export class WalletSwitchTs extends Vue {
     app: AppInfo
     activeAccount: StoreAccount
     showDeleteDialog = false
-    showUpdateDialog = false
     showCheckPWDialog = false
     deleteIndex = -1
     walletToDelete: AppWallet | boolean = false
     thirdTimestamp = 0
     walletStyleSheetType = walletStyleSheetType
-    walletToUpdate = {}
     pathToCreate = 0
     scroll: any
     formatNumber = formatNumber
-
+    showMnemonicDialog = false
     get walletList() {
         return this.app.walletList
     }
@@ -42,36 +44,28 @@ export class WalletSwitchTs extends Vue {
         return this.activeAccount.wallet
     }
 
-    getWalletStyle(item: AppWallet): string {
-        if (item.address === this.activeAddress) return walletStyleSheetType.activeWallet
-        if (item.sourceType === CreateWalletType.seed) return walletStyleSheetType.seedWallet
-        return walletStyleSheetType.otherWallet
-    }
-
     get activeAddress() {
         return this.wallet.address
     }
 
-    get accountName() {
-        return this.activeAccount.accountName
+    get currentAccount() {
+        return this.activeAccount.currentAccount
     }
 
     get networkCurrency() {
         return this.activeAccount.networkCurrency
     }
 
+    getWalletStyle(item: AppWallet): string {
+        if (item.address === this.activeAddress) return walletStyleSheetType.activeWallet
+        if (item.sourceType === CreateWalletType.seed) return walletStyleSheetType.seedWallet
+        return walletStyleSheetType.otherWallet
+    }
+
     isMultisig(address: string): boolean {
         const multisigAccountInfo: MultisigAccountInfo = this.activeAccount.multisigAccountInfo[address]
         if (!multisigAccountInfo) return false
         return multisigAccountInfo.cosignatories.length > 0
-    }
-
-    closeCheckPWDialog() {
-        this.showCheckPWDialog = false
-    }
-
-    closeUpdateDialog() {
-        this.showUpdateDialog = false
     }
 
     closeDeleteDialog() {
@@ -100,15 +94,17 @@ export class WalletSwitchTs extends Vue {
         const jumpedPath = seedPathList
             .map(a => Number(a))
             .sort()
-            .map((element, index) => { if (element !== index) return index })
+            .map((element, index) => {
+                if (element !== index) return index
+            })
             .filter(x => x !== undefined)
 
         return jumpedPath.length ? jumpedPath[0] : numberOfSeedPath
     }
 
     toCreate() {
-        const {accountName} = this
-        const walletList = JSON.parse(localRead('accountMap'))[accountName].wallets
+        const {currentAccount} = this
+        const walletList = JSON.parse(localRead('accountMap'))[currentAccount.name].wallets
         // get sorted path list
         const seedPathList = walletList.filter(item => item.path).map(item => item.path[item.path.length - 8]).sort()
         // check if seed wallets >= 10
@@ -121,19 +117,18 @@ export class WalletSwitchTs extends Vue {
         this.showCheckPWDialog = true
     }
 
-    checkEnd(password) {
+    passwordValidated(password) {
         if (!password) return
-        const {accountName, pathToCreate} = this
-        const currentNetType = JSON.parse(localRead('accountMap'))[accountName].currentNetType
+        const {pathToCreate, currentAccount} = this
+        const networkType = currentAccount.networkType
         try {
             new AppWallet().createFromPath(
                 seedWalletTitle + pathToCreate,
                 new Password(password),
                 pathToCreate,
-                currentNetType,
+                networkType,
                 this.$store,
             )
-            this.closeCheckPWDialog()
         } catch (error) {
             throw new Error(error)
         }

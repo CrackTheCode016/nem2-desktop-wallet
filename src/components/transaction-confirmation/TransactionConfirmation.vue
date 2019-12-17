@@ -1,12 +1,12 @@
 <template>
   <div class="transactionConfirmationWrap">
     <Modal
-      v-if="show"
-      v-model="show"
-      class-name="vertical-center-modal"
-      :footer-hide="true"
-      :transfer="false"
-      >
+            :title="$t('transaction_details')"
+            v-if="show"
+            v-model="show"
+            class-name="vertical-center-modal"
+            :footer-hide="true"
+            :transfer="false" >
 
       <div slot="header" class="transactionConfirmationHeader">
         <span class="title">{{$t('confirm_information')}}</span>
@@ -14,27 +14,22 @@
       <div class="transactionConfirmationBody">
         <div class="stepItem1">
           <div class="info_container">
-            <TransactionSummary
-              :formattedTransaction="formattedTransaction"
-            >
-            </TransactionSummary>
+            <TransactionDetails :transaction="formattedTransaction">
+            </TransactionDetails>
           </div>
 
-
-          <form @keyup.enter="submit">
-            <div v-if="wallet.sourceType === walletTypes.trezor">
-              <Button
-                type="success"
-                @click="confirmTransactionViaTrezor"
-                v-if="wallet.sourceType === walletTypes.trezor"
-              >
+          <form action="submit" onsubmit="event.preventDefault()" @keyup.enter="submit">
+            <div v-if="wallet.sourceType === CreateWalletType.trezor">
+              <Button type="success"
+                      @click="confirmTransactionViaTrezor"
+                      v-if="wallet.sourceType === CreateWalletType.trezor" >
                 {{$t('trezor_confirm_transaction_prompt')}}
               </Button>
             </div>
             <div v-else>
-              <input v-model="password" type="password" required
-                    :placeholder="$t('please_enter_your_wallet_password')"/>
-              <Button type="success" @click="submit">{{$t('confirm')}}</Button>
+              <input v-model.lazy="password" type="password" required
+                     :placeholder="$t('please_enter_your_wallet_password')"/>
+              <button class="radius" type="success" @click="submit">{{$t('confirm')}}</button>
               <input v-show="false" type="text">
             </div>
           </form>

@@ -3,6 +3,10 @@
   width: 1310px;
   height: 100%;
 
+  .ivu-modal {
+    width: 1000px !important;
+  }
+
   .Information {
     font-size: 16px;
     background-color: #fff;
@@ -172,7 +176,7 @@
   .accountFn {
     background-color: #fff;
     padding: 5px 0 25px;
-    height: calc(100% - 458px);
+    height: calc(100% - 348px);
     overflow: hidden;
 
     .accountFnNav {
@@ -187,8 +191,8 @@
 
         li {
           margin-top: 15px;
-          padding-right:80px;
-          height:20px;
+          padding-right: 80px;
+          height: 20px;
           margin-left: 80px;
           font-size: 12px;
           font-weight: 400;
@@ -209,8 +213,9 @@
         }
 
         li:last-of-type {
-          border-right:none;
+          border-right: none;
         }
+
         .other {
           cursor: not-allowed;
         }
@@ -256,19 +261,40 @@
     background-position: center center;
     background-repeat: no-repeat;
   }
+
   .link_text {
     display: flex;
     align-items: center;
   }
+
   .aliasLink {
     color: #26B4B0;
   }
+
   .aliasLink a {
     text-decoration: underline;
     color: #26B4B0;
   }
-  .aliasLink a hover {
+
+  .aliasLink a:hover {
     text-decoration: underline;
     color: #26B4B0;
   }
+
+  .edit-wallet-name {
+    color: #26B4B0;
+
+    i {
+      position: relative;
+      right: 10px;
+      font-size: 20px;
+    }
+  }
+
+  .alias_add:hover,
+  .alias_delete:hover,
+  i:hover {
+    opacity: .8;
+  }
+
 }

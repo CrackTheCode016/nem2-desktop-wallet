@@ -4,9 +4,6 @@ import {TransferTransaction, NamespaceId, Address} from 'nem2-sdk'
 import {Store} from 'vuex'
 
 export class FormattedTransfer extends FormattedTransaction {
-    infoFirst: string | NamespaceId
-    infoSecond: string
-    infoThird: any
     dialogDetailMap: any
 
     constructor(tx: TransferTransaction,
@@ -14,14 +11,11 @@ export class FormattedTransfer extends FormattedTransaction {
         super(tx, store)
         const {networkCurrency} = store.state.account
         const rawTx: any = this.rawTx
-            
-        this.infoFirst = this.getInfoFirst()
-
-        const fromTo = this.txHeader.isReceipt ? 'from' : 'aims'
 
         this.dialogDetailMap = {
-            'transfer_type': this.txHeader.tag,
-            [fromTo]: this.infoFirst,
+            'transaction_type': this.txHeader.tag,
+            'from': this.getSigner(),
+            'aims': this.getRecipient(tx),
             'fee': getRelativeMosaicAmount(tx.maxFee.compact(), networkCurrency.divisibility) + ' ' + networkCurrency.ticker,
             'block': this.txHeader.block,
             'hash': this.txHeader.hash,
@@ -30,17 +24,15 @@ export class FormattedTransfer extends FormattedTransaction {
         }
     }
 
-    getRecipient(): string | NamespaceId {
-        const rawTx: any = this.rawTx
-        const recipientAddress: NamespaceId | Address = rawTx.recipientAddress
-        if (recipientAddress instanceof NamespaceId) return recipientAddress
-        return recipientAddress.pretty()
-    }
-
-    getInfoFirst(): string | NamespaceId {
-        if (!this.txHeader.isReceipt) return this.getRecipient()
+    getSigner(): string | NamespaceId {
         if (!this.rawTx.signer) return null
         return this.rawTx.signer.address.pretty()
+    }
+
+    getRecipient(tx: TransferTransaction): string | NamespaceId {
+        return tx.recipientAddress instanceof Address
+            ? tx.recipientAddress.pretty()
+            : tx.recipientAddress
     }
 }
 

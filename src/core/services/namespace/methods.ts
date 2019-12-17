@@ -27,7 +27,10 @@ export const getNamespacesFromAddress = async (address: string,
             .toPromise()
 
         const namespaceIds = namespaceInfo.map(nsInfo => nsInfo.id)
-        const namespaceNames = await namespaceHttp.getNamespacesName(namespaceIds).toPromise()
+        const namespaceNames = namespaceIds.length
+            ? await namespaceHttp.getNamespacesName(namespaceIds).toPromise()
+            : []
+
         return namespaceInfo.map(nsInfo => AppNamespace.fromNamespaceInfo(nsInfo, namespaceNames))
     } catch (error) {
         throw new Error(error)
@@ -66,9 +69,16 @@ export const handleRecipientAddressAsNamespaceId = async (  transactions: Format
 
     if (!newNamespacesIds.length) return
         const newNamespaces = await new NamespaceHttp(node).getNamespacesName(newNamespacesIds).toPromise()
-        const AppNamespaces = newNamespaces.map(AppNamespace.fromNamespaceName)
-        store.commit('ADD_NAMESPACE_FROM_RECIPIENT_ADDRESS', AppNamespaces)
+        const appNamespaces = AppNamespace.fromNamespaceNames(newNamespaces)
+        store.commit('ADD_NAMESPACE_FROM_RECIPIENT_ADDRESS', appNamespaces)
     } catch (error) {
         console.error("handleRecipientAddressAsNamespaceId -> error", error)
     }
+}
+
+export const formatSenderOrRecipient = (recipient: string | NamespaceId, store: Store<AppState>): string => {
+    if (recipient instanceof NamespaceId) {
+        return getNamespaceNameFromNamespaceId(recipient.id.toHex(), store)
+    }
+    return recipient
 }

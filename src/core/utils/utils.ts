@@ -1,3 +1,6 @@
+import {NetworkType} from "nem2-sdk"
+import {defaultNetworkConfig} from "@/config"
+
 export const copyTxt = (txt) => {
     return new Promise((resolve) => {
         const input = document.createElement('input')
@@ -52,15 +55,33 @@ export const isRefreshData = function (localStorageName, refreshTime, borderline
 
 export const cloneData = object => JSON.parse(JSON.stringify(object))
 
-export const getTopValueInObject = (object: any) => {
+export const getTopValueInObject = (object: any): any => {
     return Object.values(object)[0]
 }
 
 /**
  * Flattens an array that can have elements nested up to 2 levels
- * @param array 
+ * @param array
  */
 export const flattenArrayOfStrings = (array: any[]): any[] => {
     const step1 = [].concat(...array).map(item => item)
     return [].concat(...step1).map(item => item)
+}
+
+export const httpToWs = (URL: string): string => {
+    const url = URL.toLowerCase()
+    const isHttps = url.substring(0, 5) === 'https'
+
+    return isHttps
+        ? url.replace('https', 'wss')
+        : url.replace('http', 'ws')
+}
+
+export function getDefaultAccountNetworkType(): NetworkType {
+    const accountMap = localRead('accountMap')
+    if (accountMap === '') return defaultNetworkConfig.DEFAULT_NETWORK_TYPE
+    // use the last created account network type
+    const accounts: any[] = Object.values(JSON.parse(accountMap)).reverse()
+    if (!accounts[0]) return defaultNetworkConfig.DEFAULT_NETWORK_TYPE
+    return accounts[0].networkType
 }

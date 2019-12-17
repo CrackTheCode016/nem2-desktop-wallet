@@ -31,23 +31,13 @@ export class MenuBarTs extends Vue {
     monitorUnselected = monitorUnselected
     languageList = languageConfig
     NetworkType = NetworkType
+    closeWindow = closeWindow
 
     get routes() {
         return routes[0].children
             .filter(({meta}) => meta.clickable)
             .map(({path, meta}) => ({path, meta}))
     }
-
-    // @ROUTING
-    accountQuit() {
-        this.$store.commit('RESET_APP')
-        this.$store.commit('RESET_ACCOUNT')
-        this.$router.push({
-            name: "login"
-        })
-    }
-
-    closeWindow = closeWindow
 
     get isNodeHealthy() {
         return this.app.isNodeHealthy
@@ -77,6 +67,12 @@ export class MenuBarTs extends Vue {
         return this.app.nodeNetworkType
     }
 
+    get nodeNetworkTypeText() {
+        const {nodeNetworkType} = this
+        if (!this.isNodeHealthy) return this.$t('Invalid_node')
+        return nodeNetworkType ? NetworkType[nodeNetworkType] : this.$t('Loading')
+    }
+
     set language(lang) {
         this.$i18n.locale = lang
         localSave('locale', lang)
@@ -88,11 +84,28 @@ export class MenuBarTs extends Vue {
     }
 
     get accountName() {
-        return this.activeAccount.accountName
+        return this.activeAccount.currentAccount.name
     }
 
     set currentWalletAddress(newActiveWalletAddress) {
         AppWallet.updateActiveWalletAddress(newActiveWalletAddress, this.$store)
+    }
+
+    get nodeLoading() {
+        return this.app.nodeLoading
+    }
+
+    navigationIconClicked(route: any): void {
+        if (!this.walletList.length) return
+        if (this.$route.matched.map(({path}) => path).includes(route.path)) return
+        this.$router.push(route.path).catch(err => {
+        })
+    }
+
+    accountQuit() {
+        this.$store.commit('RESET_APP')
+        this.$store.commit('RESET_ACCOUNT')
+        this.$router.push("login")
     }
 
     maxWindow() {
@@ -118,7 +131,6 @@ export class MenuBarTs extends Vue {
         if (this.node == this.nodeList[index].value) return
         this.nodeList.forEach(item => item.isSelected = false)
         this.nodeList[index].isSelected = true
-        const node = this.nodeList[index].value
         this.$store.commit('SET_NODE', this.nodeList[index].value)
     }
 

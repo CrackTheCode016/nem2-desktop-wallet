@@ -1,8 +1,13 @@
-import {NetworkType} from "nem2-sdk"
-import {FEE_SPEEDS} from '@/config'
-
+import {NetworkType, MosaicSupplyChangeAction} from "nem2-sdk"
+import {FEE_SPEEDS} from '../constants'
 
 export const formDataConfig = {
+    settingPassword: {
+        previousPassword: '',
+        newPassword: '',
+        confirmPassword: '',
+        cipher: '',
+    },
     offsetLineForm: {
         generationHash: '',
         mosaicId: '',
@@ -15,7 +20,6 @@ export const formDataConfig = {
         password: '',
         passwordAgain: '',
         hint: '',
-        currentNetType: NetworkType.MIJIN_TEST,
     },
     importKeystoreConfig: {
         walletName: 'keystore-wallet',
@@ -41,14 +45,9 @@ export const formDataConfig = {
         password: ''
     },
     mosaicEditForm: {
-        id: '',
-        aliasName: '',
-        delta: 0,
-        supplyType: 1,
-        changeDelta: 0,
-        duration: '',
+        delta: 1,
+        supplyType: MosaicSupplyChangeAction.Increase,
         feeSpeed: FEE_SPEEDS.NORMAL,
-        password: ''
     },
     mosaicUnAliasForm: {
         feeSpeed: FEE_SPEEDS.NORMAL,
@@ -75,14 +74,12 @@ export const formDataConfig = {
         multisigPublicKey: ''
     },
     multisigConversionForm: {
-        publicKeyList: [],
         minApproval: 1,
         minRemoval: 1,
         feeSpeed: FEE_SPEEDS.NORMAL,
         multisigPublicKey: '',
     },
     multisigModificationForm: {
-        publicKeyList: [],
         minApproval: 0,
         minRemoval: 0,
         feeSpeed: FEE_SPEEDS.NORMAL,
@@ -90,12 +87,11 @@ export const formDataConfig = {
     },
     namespaceEditForm: {
         name: '',
-        duration: 0,
+        duration: 1000,
         feeSpeed: FEE_SPEEDS.NORMAL,
-        password: ''
     },
     rootNamespaceForm: {
-        duration: 1000,
+        duration: 1000000,
         rootNamespaceName: '',
         multisigPublicKey: '',
         feeSpeed: FEE_SPEEDS.NORMAL,

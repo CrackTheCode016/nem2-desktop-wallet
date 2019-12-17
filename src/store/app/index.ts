@@ -1,7 +1,14 @@
-import {AppInfo, ChainStatus, LockParams, StagedTransaction, Log} from '@/core/model'
+import {
+    AppInfo,
+    ChainStatus,
+    LockParams,
+    StagedTransaction,
+    Log,
+    LoadingOverlayObject,
+} from '@/core/model'
 import {localRead} from "@/core/utils";
-import {Transaction} from 'nem2-sdk';
 import {MutationTree} from 'vuex';
+import {explorerLinkList} from "@/config"
 
 const state: AppInfo = {
     timeZone: new Date().getTimezoneOffset() / 60,   // current time zone
@@ -25,6 +32,12 @@ const state: AppInfo = {
     },
     nodeNetworkType: '',
     logs: [],
+    loadingOverlay: {
+        show: false,
+        message: '',
+    },
+    explorerBasePath: explorerLinkList[0].explorerBasePath,
+    nodeLoading: false
 }
 
 const mutations: MutationTree<AppInfo> = {
@@ -66,7 +79,7 @@ const mutations: MutationTree<AppInfo> = {
     SET_NAMESPACE_LOADING(state: AppInfo, namespaceLoading: boolean) {
         state.namespaceLoading = namespaceLoading
     },
-    SET_UI_DISABLED(state: AppInfo, { isDisabled, message }: { isDisabled: boolean, message: string}) {
+    SET_UI_DISABLED(state: AppInfo, {isDisabled, message}: {isDisabled: boolean, message: string}) {
         state.isUiDisabled = isDisabled;
         state.uiDisabledMessage = message;
     },
@@ -79,7 +92,55 @@ const mutations: MutationTree<AppInfo> = {
     ADD_LOG(state: AppInfo, log: Log) {
         state.logs.unshift(log)
     },
+    SET_LOADING_OVERLAY(state: AppInfo, loadingOverlay: LoadingOverlayObject) {
+        Object.assign(state.loadingOverlay, loadingOverlay)
+    },
+    SET_TEMPORARY_PASSWORD(state: AppInfo, password: string) {
+        state.loadingOverlay.temporaryInfo = {}
+        state.loadingOverlay.temporaryInfo.password = password
+    },
+    SET_TEMPORARY_MNEMONIC(state: AppInfo, mnemonic: string) {
+        state.loadingOverlay.temporaryInfo.mnemonic = mnemonic
+    },
+    REMOVE_TEMPORARY_INFO(state: AppInfo) {
+        delete state.loadingOverlay.temporaryInfo
+    },
+    /** Subscribed in App.vue */
+    TRIGGER_NOTICE(state: AppInfo, message: string) {},
+    SET_NODE_LOADING(state: AppInfo, nodeLoading: boolean) {
+        state.nodeLoading = nodeLoading
+    },
+    SET_EXPLORER_BASE_PATH(state: AppInfo, explorerBasePath: string) {
+        state.explorerBasePath = explorerBasePath
+    },
+}
+
+const actions = {
+    SET_CHAIN_STATUS({commit, rootState}, payload: {endpoint: string, chainStatus: ChainStatus}) {
+        const {endpoint, chainStatus} = payload
+        if (endpoint !== rootState.account.node) return
+        commit('SET_CHAIN_STATUS', chainStatus)
+    },
+
+    SET_IS_NODE_HEALTHY({commit, rootState}, payload: {endpoint: string, isNodeHealthy: boolean}) {
+        const {endpoint, isNodeHealthy} = payload
+        if (endpoint !== rootState.account.node) return
+        commit('SET_IS_NODE_HEALTHY', isNodeHealthy)
+    },
+
+    SET_NODE_NETWORK_TYPE({commit, rootState}, payload: {endpoint: string, nodeNetworkType: number}) {
+        const {endpoint, nodeNetworkType} = payload
+        if (endpoint !== rootState.account.node) return
+        commit('SET_NODE_NETWORK_TYPE', nodeNetworkType)
+    },
+
+    SET_NODE_LOADING({commit, rootState}, payload: {endpoint: string, nodeLoading: boolean}) {
+        const {endpoint, nodeLoading} = payload
+        if (endpoint !== rootState.account.node) return
+        commit('SET_NODE_LOADING', nodeLoading)
+    }
 }
 
 export const appState = {state}
 export const appMutations = {mutations}
+export const appActions = {actions}

@@ -1,11 +1,18 @@
-import {TransactionType, NamespaceId} from 'nem2-sdk'
+import {TransactionType, NamespaceId, Address} from 'nem2-sdk'
 import {mapState} from "vuex"
 import {Component, Vue, Prop} from 'vue-property-decorator'
 import {formatNumber, renderMosaics} from '@/core/utils'
-import {FormattedTransaction, AppInfo, StoreAccount, TRANSACTIONS_CATEGORIES, AppWallet} from '@/core/model'
-import {defaultNetworkConfig, explorerUrlHead} from '@/config'
-import {signTransaction} from '@/core/services'
+import {
+    FormattedTransaction,
+    AppInfo,
+    StoreAccount,
+    TRANSACTIONS_CATEGORIES,
+    AppWallet,
+    FormattedAggregateBonded
+} from '@/core/model'
+import {signAndAnnounce} from '@/core/services'
 import TransactionModal from '@/components/transaction-modal/TransactionModal.vue'
+import {defaultNetworkConfig} from "@/config"
 
 @Component({
     computed: {...mapState({activeAccount: 'account', app: 'app'})},
@@ -25,12 +32,11 @@ export class TransactionListTs extends Vue {
     showDialog: boolean = false
     activeTransaction: FormattedTransaction = null
     NamespaceId = NamespaceId
-
     @Prop({default: null})
     mode: string
 
     get wallet() {
-        return this.activeAccount.wallet
+        return new AppWallet(this.activeAccount.wallet)
     }
 
     get transactionsLoading() {
@@ -39,9 +45,7 @@ export class TransactionListTs extends Vue {
 
     get transactionList() {
         if (this.mode && this.mode === TRANSACTIONS_CATEGORIES.TO_COSIGN) {
-            const {wallet, transactionsToCosign} = this.activeAccount
-            const {publicKey} = wallet
-            return transactionsToCosign[publicKey] || []
+            return this.activeAccount.transactionsToCosign || []
         }
 
         return this.activeAccount.transactionList
@@ -66,16 +70,14 @@ export class TransactionListTs extends Vue {
     }
 
 
-    getExplorerUrl(transactionHash) {
-        return explorerUrlHead + transactionHash
-
-    }
-
-
     get pageTitle() {
         return this.mode === TRANSACTIONS_CATEGORIES.TO_COSIGN
             ? 'Transactions_to_cosign'
             : 'transaction_record'
+    }
+
+    get explorerBasePath() {
+        return this.app.explorerBasePath
     }
 
     getName(namespaceId: NamespaceId) {
@@ -88,7 +90,7 @@ export class TransactionListTs extends Vue {
     renderHeightAndConfirmation(transactionHeight: number): string {
         if (transactionHeight === 0) return null
         const {currentHeight} = this
-        if (!currentHeight) return `${transactionHeight}`
+            if (!currentHeight) return `${transactionHeight}`
 
         const confirmations = currentHeight - transactionHeight + 1
         /** Prevents a reactivity glitch */
@@ -118,20 +120,12 @@ export class TransactionListTs extends Vue {
         this.scroll.target.scrollTop = 0
     }
 
-    async confirmViaTransactionConfirmation() {
+    confirmViaTransactionConfirmation() {
         try {
-            const {
-                success,
-                signedTransaction,
-                signedLock,
-            } = await signTransaction({
+            signAndAnnounce({
                 transaction: this.activeTransaction.rawTx,
                 store: this.$store,
             })
-
-            if (success) {
-                new AppWallet(this.wallet).announceTransaction(signedTransaction, this.activeAccount.node, this, signedLock)
-            }
         } catch (error) {
             console.error("TransactionListTs -> confirmViaTransactionConfirmation -> error", error)
         }
@@ -141,9 +135,18 @@ export class TransactionListTs extends Vue {
         this.activeTransaction = transaction
 
         if (this.mode === TRANSACTIONS_CATEGORIES.TO_COSIGN) {
+            if (transaction instanceof FormattedAggregateBonded
+                && transaction.alreadyCosignedBy(Address.createFromRawAddress(this.wallet.address))) {
+                this.showDialog = true
+                return
+            }
             return this.confirmViaTransactionConfirmation()
         }
-
         this.showDialog = true
+    }
+
+    openExplorer(transactionHash) {
+        const {explorerBasePath} = this
+        return explorerBasePath + transactionHash
     }
 }

@@ -2,7 +2,7 @@ import {Transaction, MultisigAccountInfo, SignedTransaction, CosignatureSignedTr
 import {AppNamespace} from './AppNamespace'
 import {AppMosaic} from './AppMosaic'
 import {FormattedTransaction} from './FormattedTransaction'
-import {ChainStatus, AppWallet, LockParams, Log} from '.'
+import {ChainStatus, AppWallet, LockParams, Log, CurrentAccount} from '.'
 
 export interface AddressAndTransaction {
     address: string
@@ -36,32 +36,39 @@ export interface RemoteAccount {
     publicKey: string,
 }
 
+
 export interface StoreAccount {
-    node: string,
-    wallet: AppWallet,
-    mosaics: Record<string, AppMosaic>,
-    namespaces: AppNamespace[],
-    errorTx: Array<any>,
+    node: string
+    wallet: AppWallet
+    mosaics: Record<string, AppMosaic>
+    namespaces: AppNamespace[]
     addressAliasMap: any,
-    generationHash: string,
-    transactionList: FormattedTransaction[],
-    transactionsToCosign: Record<string, FormattedTransaction[]>,
-    accountName: string
-    activeMultisigAccount: string,
-    multisigAccountsMosaics: Record<string, Record<string, AppMosaic>>,
-    multisigAccountsNamespaces: Record<string, AppNamespace[]>,
-    multisigAccountsTransactions: Record<string, Transaction[]>,
-    multisigAccountInfo: Record<string, MultisigAccountInfo>,
+    generationHash: string
+    transactionList: FormattedTransaction[]
+    currentAccount: CurrentAccount
+    activeMultisigAccount: string
+    multisigAccountsMosaics: Record<string, Record<string, AppMosaic>>
+    multisigAccountsNamespaces: Record<string, AppNamespace[]>
+    multisigAccountsTransactions: Record<string, Transaction[]>
+    multisigAccountInfo: Record<string, MultisigAccountInfo>
+    transactionsToCosign: FormattedTransaction[],
     activeWalletAddress: string
     /**
      *  The network currency, to be used for fees management,
      *  formatting, defaulting...
      */
-    networkCurrency: NetworkCurrency,
+    networkCurrency: NetworkCurrency
     /**
      * This property is ONLY for mosaic list initialization purposes
      */
-    networkMosaics: Record<string, AppMosaic>,
+    networkMosaics: Record<string, AppMosaic>
+}
+
+export interface LoadingOverlayObject {
+    show: boolean,
+    message: string,
+    networkMosaics?: Record<string, AppMosaic>,
+    temporaryInfo?: any
 }
 
 export interface AppInfo {
@@ -82,6 +89,9 @@ export interface AppInfo {
     stagedTransaction: StagedTransaction,
     nodeNetworkType: string,
     logs: Log[],
+    loadingOverlay: LoadingOverlayObject,
+    nodeLoading:boolean,
+    explorerBasePath:string
 }
 
 export interface StagedTransaction {
@@ -94,7 +104,7 @@ export interface SignTransaction {
     success: Boolean
     signedTransaction: SignedTransaction | CosignatureSignedTransaction
     signedLock?: SignedTransaction
-    error: (String|null)
+    error: (String | null)
 }
 
 export interface AppState {
@@ -131,8 +141,28 @@ export enum TRANSACTIONS_CATEGORIES {
     TO_COSIGN = 'TO_COSIGN',
 }
 
+export enum RECIPIENT_TYPES {
+    ADDRESS = 'ADDRESS',
+    ALIAS = 'ALIAS',
+    PUBLIC_KEY = 'PUBLIC_KEY',
+}
+
+export enum BindTypes {
+    ADDRESS = 'ADDRESS',
+    MOSAIC = 'MOSAIC'
+}
+
+export enum AddOrRemove {
+    ADD = 'ADD',
+    REMOVE = 'REMOVE',
+}
+
+export interface ValidationObject {
+    valid: false | string
+}
+
 /**
- * These keys will be handled in a specific way by the transaction detail modal component
+ * These keys will be handled in a specific way by the transaction info template component
  */
 export enum SpecialTxDetailsKeys {
     mosaics = 'mosaics',
@@ -140,15 +170,8 @@ export enum SpecialTxDetailsKeys {
     cosignatories = 'cosignatories',
     from = 'from',
     aims = 'aims',
-    hash='hash'
-}
-
-export enum TxDetailsKeysWithValueToTranslate {
-    action = 'action',
-    direction = 'direction',
-    supplyMutable = 'supplyMutable',
-    transferable = 'transferable',
-    restrictable = 'restrictable',
+    hash = 'hash',
+    cosigned_by = 'cosigned_by',
 }
 
 export interface BlocksAndTime {

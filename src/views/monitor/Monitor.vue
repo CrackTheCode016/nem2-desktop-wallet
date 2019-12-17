@@ -1,5 +1,6 @@
 <template>
   <div class="monitor_panel_container">
+
     <div class="monitor_panel_left_container" ref="monitorPanelLeftContainer">
       <div class="top_wallet_address radius">
         <div class="wallet_address">
@@ -12,8 +13,8 @@
 
         <div class="split"></div>
         <div class="XEM_amount overflow_ellipsis">
-          <span>{{ticker}}</span>
-          <span class="amount">{{formatNumber(balance)}}</span>
+          <div>{{ticker}}</div>
+          <div class="amount">{{formatNumber(balance)}}</div>
         </div>
         <div class="exchange">
           {{ xemUsdPrice > 0 ? `$${formatNumber(balance*xemUsdPrice)}` : '' }}
@@ -87,7 +88,7 @@
                 </span>
               </div>
               <div class="complete_container">
-                <div class="complete" @click="showMosaicMap">{{$t('complete')}}</div>
+                <div class="complete" @click="showMosaicMap">{{$t('Close')}}</div>
               </div>
               <div class="mosaic_data"></div>
             </div>
@@ -96,6 +97,44 @@
       </div>
     </div>
     <div class="monitor_panel_right_container">
+      <div class="top_network_info radius">
+        <div class="top_wallet_info">
+          <div class="netWork radius">
+            <div class="title">
+              <span class="title_txt">{{$t('nodes')}}</span>
+            </div>
+            <img src="@/common/img/monitor/network.png"/>
+            <span class="txt_info"><numberGrow :value="chainStatus.nodeNumber"></numberGrow></span>
+          </div>
+          <div class="block_height radius">
+            <div class="title">
+              <span class="title_txt">{{$t('blocks')}}</span>
+            </div>
+            <img src="@/common/img/monitor/block_height.png"/>
+            <span class="txt_info">
+            <numberGrow :value="currentHeight"></numberGrow>
+          </span>
+          </div>
+          <div class="amount radius">
+            <div class="title">
+              <span class="title_txt">{{$t('transactions')}}</span>
+            </div>
+            <img src="@/common/img/windowDashboardActive.png"/>
+            <span class="txt_info">
+            <numberGrow :value="chainStatus.numTransactions"></numberGrow>
+          </span>
+          </div>
+          <div class="block_time radius">
+            <div class="title">
+              <span class="title_txt">{{$t('time')}} <span  class="title_txt">{{chainStatus.getTimeFromBlockNumber(chainStatus.currentHeight)}}</span></span>
+            </div>
+            <img src="@/common/img/monitor/amount.png"/>
+            <span class="txt_info">
+            <numberGrow :value="chainStatus.targetBlockTime"></numberGrow>
+          </span>
+          </div>
+        </div>
+      </div>
       <div class="top_navidator radius">
         <span
                 v-for="({path, name, active}, index) in routes"
@@ -103,15 +142,16 @@
                 :class="[
                     active ? 'active_navigator' : '',
                     'outter_container',
+                    'radius',
                     active ? 'disabled' : 'pointer'
                 ]"
-                @click="$router.push(path)"
+                @click="active ? '' : $router.push(path).catch(err => {})"
         >
           <span class="inner_container absolute">{{$t(name)}}</span>
           <span class="line">|</span>
         </span>
       </div>
-      <div class="bottom_router_view">
+      <div class="radius bottom_router_view">
         <router-view/>
       </div>
       <div class="transaction_status radius"/>

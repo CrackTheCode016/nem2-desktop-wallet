@@ -6,16 +6,14 @@
     class-name="dash_board_dialog text_select"
   >
     <DisabledForms />
-
     <GetNodePublicKey v-if="showGetNodePublicKey" />
-
     <form action="submit" onsubmit="event.preventDefault()" @keyup.enter="submit">
       <div class="gray_input_content">
         <span class="title">{{$t('Node_public_key')}}</span>
         <ErrorTooltip fieldName="recipientPublicKey">
           <input
             v-model="recipientPublicKey"
-            v-validate="'required|publicKey'"
+            v-validate="validation.recipientPublicKey"
             v-focus
             type="text"
             :placeholder="$t('Node_public_key')"
@@ -34,12 +32,12 @@
         <span class="title">{{$t('password')}}</span>
         <ErrorTooltip fieldName="password">
           <input
-            v-model="password"
-            :type="standardFields.walletPassword.type"
-            v-validate="standardFields.walletPassword.validation"
-            :data-vv-name="standardFields.walletPassword.name"
-            :data-vv-as="$t(standardFields.walletPassword.name)"
-            :placeholder="$t(standardFields.walletPassword.name)"
+            v-model.lazy="password"
+            type="password"
+            v-validate="validation.walletPassword"
+            data-vv-name="password"
+            :data-vv-as="$t('password')"
+            :placeholder="$t('password')"
           />
         </ErrorTooltip>
         <input v-show="false" v-model="wallet" v-validate disabled data-vv-name="wallet" />
@@ -57,4 +55,4 @@ export default class PersistentDelegationRequest extends PersistentDelegationReq
 </script>
 <style lang="less">
 @import "PersistentDelegationRequest.less";
-</style> 
+</style>

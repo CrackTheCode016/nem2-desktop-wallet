@@ -1,4 +1,5 @@
 .transaction_modal {
+
   .inner_transaction_title {
     width: 200px !important;
   }
@@ -19,14 +20,13 @@
   }
 
 
-
   .bottom_transactions {
     background-color: white;
     position: relative;
     overflow: hidden;
     height: 100%;
 
-    .splite_page {
+    .split_page {
       position: absolute;
       right: 90px;
       z-index: 0;
@@ -335,57 +335,7 @@
     }
   }
 
-  .ivu-modal-body {
-    padding: unset !important;
-  }
 
-  .dash_board_dialog {
-    .value {
-      border: none;
-    }
-
-    display: flex;
-    align-items: center;
-    justify-content: center;
-
-    .ivu-modal-close {
-      top: 15px;
-      right: 15px;
-    }
-
-    .title {
-      display: inline-block;
-      width: 150px;
-      margin-right: 10px;
-      font-weight: 400;
-      color: rgba(153, 153, 153, 1);
-      text-align: left;
-      margin-top: 3px;
-    }
-
-    span {
-      font-size: 16px;
-    }
-
-    .value {
-      font-size: 16px;
-      font-weight: 400;
-      color: rgba(34, 34, 34, 1);
-    }
-
-    .other_info:nth-of-type(even) {
-      margin-bottom: 30px;
-    }
-
-    .transfer_type {
-
-      .value {
-        font-size: 20px;
-        font-weight: bold;
-        color: rgba(241, 95, 35, 1);
-      }
-    }
-  }
 
   .no_data {
     text-align: center;
@@ -435,10 +385,19 @@
 
   .mosaic_info {
     .title {
-      vertical-align:top;
+      vertical-align: top;
     }
   }
+
   .no_data {
     color: #ccc;
+  }
+
+  .transaction-modal-dialog {
+    .ivu-modal {
+      width: 1260px !important;
+      height: 680px !important;
+    }
+
   }
 }

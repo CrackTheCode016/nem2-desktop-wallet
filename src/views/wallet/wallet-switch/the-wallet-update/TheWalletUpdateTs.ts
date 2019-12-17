@@ -22,10 +22,7 @@ export class TheWalletUpdateTs extends Vue {
     walletToUpdate: AppWallet
 
     get accountName() {
-        return this.activeAccount.accountName
-    }
-
-    checkPasswordDialogCancel() {
+        return this.activeAccount.currentAccount.name
     }
 
     updateDialogCancel() {
@@ -33,9 +30,7 @@ export class TheWalletUpdateTs extends Vue {
     }
 
     submit() {
-        const {name} = this.wallet
-        const {accountName, walletToUpdate} = this
-        new AppWallet().updateWalletName(accountName, name, walletToUpdate.address, this.$store)
+        new AppWallet(this.walletToUpdate).updateWalletName(this.wallet.name, this.$store)
         this.$emit('closeUpdateDialog')
     }
 
