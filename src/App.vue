@@ -273,8 +273,6 @@
                     if (newValue && oldValue !== newValue) {
                         this.Network.switchNode(newValue);
                         this.Listeners.switchEndpoint(newValue);
-                        // need update wallet info after node change
-                        this.onWalletChange(this.wallet)
                     }
                 });
         }
