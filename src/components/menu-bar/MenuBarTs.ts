@@ -1,4 +1,4 @@
-import {Message, isWindows} from "@/config/index.ts"
+import {isWindows} from "@/config/index.ts"
 import monitorSelected from '@/common/img/window/windowSelected.png'
 import monitorUnselected from '@/common/img/window/windowUnselected.png'
 import {completeUrlWithHostAndProtocol, localRead, localSave} from "@/core/utils"
@@ -141,26 +141,24 @@ export class MenuBarTs extends Vue {
 
     selectEndpoint(index) {
         if (this.node == this.nodeList[index].value) return
-        this.nodeList = this.nodeList.map(item => {
-            item.isSelected = false
-            return item
-        })
-        this.nodeList[index].isSelected = true
         this.$store.commit('SET_NODE', this.nodeList[index].value)
         this.refreshValidate()
 
     }
 
     switchToNewNode() {
-        let {nodeList, inputNodeValue} = this
+        let {inputNodeValue} = this
+        const nodeAlreadyExistsFlag = this.nodeList.findIndex(item => item.value == inputNodeValue)
+        if (nodeAlreadyExistsFlag !== -1) {
+            this.nodeList.splice(nodeAlreadyExistsFlag, 1)
+        }
         this.nodeList.unshift({
             value: inputNodeValue,
             name: inputNodeValue,
-            url: inputNodeValue,
-            isSelected: true,
+            url: inputNodeValue
         })
         this.selectEndpoint(0)
-        localSave('nodeList', JSON.stringify(nodeList))
+        localSave('nodeList', JSON.stringify(this.nodeList))
     }
 
     // @VEE-VALIDATE
@@ -178,7 +176,6 @@ export class MenuBarTs extends Vue {
     initNodeList() {
         const nodeListData = localRead('nodeList')
         this.nodeList = nodeListData ? JSON.parse(nodeListData) : nodeListConfig
-        this.$store.commit('SET_NODE', this.nodeList.find(item => item.isSelected).value)
     }
 
     created() {

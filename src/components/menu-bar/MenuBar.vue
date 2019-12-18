@@ -67,7 +67,7 @@
                   <div class="node_list_container scroll">
                     <div @click="selectEndpoint(index)" class="point_item pointer" v-for="(p,index) in nodeList"
                          :key="`sep${index}`">
-                      <img :src="p.isSelected ? monitorSelected : monitorUnselected">
+                      <img :src="p.value ==node? monitorSelected : monitorUnselected">
                       <span class="node_url text_select">{{p.value}}</span>
                       <img class="remove_icon" @click.stop="removeNode(index)"
                            src="@/common/img/service/multisig/multisigDelete.png">
@@ -80,7 +80,6 @@
                         v-validate="validation.friendlyNodeUrl"
                         :data-vv-as="$t('node')"
                         data-vv-name="friendlyNodeUrl"
-                        :data="defaultExplorerLinkList"
                         placeholder="please input url here"
                         v-model="inputNodeValue"
                         :placeholder="$t('please_enter_a_custom_nod_address')">

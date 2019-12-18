@@ -121,7 +121,6 @@ export interface Endpoint {
     value: string,
     name: string,
     url: string,
-    isSelected: boolean
 }
 
 export enum ANNOUNCE_TYPES {

@@ -7,9 +7,10 @@ import {
     AppWallet, AppNamespace, FormattedTransaction, CurrentAccount,
 } from '@/core/model'
 import {nodeListConfig} from "@/config/view/node"
+import {localRead, localSave} from "@/core/utils"
 
 const state: StoreAccount = {
-    node: nodeListConfig.find((node) => node.isSelected).value,
+    node: localRead('activeNode') || nodeListConfig[0].value,
     wallet: null,
     mosaics: {},
     namespaces: [],
@@ -107,6 +108,7 @@ const mutations: MutationTree<StoreAccount> = {
     },
     SET_NODE(state: StoreAccount, node: string): void {
         state.node = node
+        localSave('activeNode',node)
     },
     SET_GENERATION_HASH(state: StoreAccount, generationHash: string): void {
         state.generationHash = generationHash
