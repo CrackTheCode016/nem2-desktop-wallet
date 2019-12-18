@@ -1,4 +1,4 @@
-import {Store} from 'vuex'
+import { Store } from 'vuex'
 import {
     Account,
     NetworkType,
@@ -22,16 +22,16 @@ import {
     PublicAccount,
 } from 'nem2-sdk'
 import CryptoJS from 'crypto-js'
-import {filter, mergeMap} from 'rxjs/operators'
-import {Message, networkConfig, defaultNetworkConfig} from "@/config"
-import {localRead, localSave, getAccountFromPathNumber, getPath} from "@/core/utils"
-import {AppAccounts, CreateWalletType} from "@/core/model"
-import {AppState, RemoteAccount} from './types'
-import {Log} from './Log'
-import {Notice, NoticeType} from './Notice'
+import { filter, mergeMap } from 'rxjs/operators'
+import { Message, networkConfig, defaultNetworkConfig } from "@/config"
+import { localRead, localSave, getAccountFromPathNumber, getPath } from "@/core/utils"
+import { AppAccounts, CreateWalletType } from "@/core/model"
+import { AppState, RemoteAccount } from './types'
+import { Log } from './Log'
+import { Notice, NoticeType } from './Notice'
 
-const {DEFAULT_LOCK_AMOUNT} = defaultNetworkConfig
-const {EMPTY_LINKED_ACCOUNT_KEY} = networkConfig
+const { DEFAULT_LOCK_AMOUNT } = defaultNetworkConfig
+const { EMPTY_LINKED_ACCOUNT_KEY } = networkConfig
 
 export class AppWallet {
     constructor(wallet?: {
@@ -56,10 +56,10 @@ export class AppWallet {
     remoteAccount: RemoteAccount | null
 
     createFromPrivateKey(name: string,
-                         password: Password,
-                         privateKey: string,
-                         networkType: NetworkType,
-                         store: Store<AppState>): AppWallet {
+        password: Password,
+        privateKey: string,
+        networkType: NetworkType,
+        store: Store<AppState>): AppWallet {
         try {
             this.simpleWallet = SimpleWallet.createFromPrivateKey(name, password, privateKey, networkType)
             this.name = name
@@ -173,11 +173,11 @@ export class AppWallet {
     }
 
     createFromKeystore(name: string,
-                       password: Password,
-                       keystorePassword: Password,
-                       keystoreStr: string,
-                       networkType: NetworkType,
-                       store: Store<AppState>): AppWallet {
+        password: Password,
+        keystorePassword: Password,
+        keystoreStr: string,
+        networkType: NetworkType,
+        store: Store<AppState>): AppWallet {
         try {
             this.name = name
             this.networkType = networkType
@@ -185,7 +185,7 @@ export class AppWallet {
             const keystore = words.toString(CryptoJS.enc.Utf8)
             this.simpleWallet = JSON.parse(keystore)
             this.sourceType = CreateWalletType.keyStore
-            const {privateKey} = this.getAccount(keystorePassword)
+            const { privateKey } = this.getAccount(keystorePassword)
             this.createFromPrivateKey(name, password, privateKey, networkType, store)
             return this
         } catch (error) {
@@ -194,8 +194,8 @@ export class AppWallet {
     }
 
     getAccount(password: Password): Account {
-        const {encryptedKey, iv} = this.simpleWallet.encryptedPrivateKey
-        const {network} = this.simpleWallet
+        const { encryptedKey, iv } = this.simpleWallet.encryptedPrivateKey
+        const { network } = this.simpleWallet
         const privateKey = new EncryptedPrivateKey(encryptedKey, iv).decrypt(password)
         return Account.createFromPrivateKey(privateKey, network)
     }
@@ -204,7 +204,7 @@ export class AppWallet {
         try {
             if (!this.checkPassword(password)) throw new Error('Wrong password')
             const _password = new Password(password)
-            const {encryptedKey, iv} = this.remoteAccount.simpleWallet.encryptedPrivateKey
+            const { encryptedKey, iv } = this.remoteAccount.simpleWallet.encryptedPrivateKey
             return new EncryptedPrivateKey(encryptedKey, iv).decrypt(_password).toUpperCase()
         } catch (error) {
             throw new Error(error)
@@ -262,7 +262,7 @@ export class AppWallet {
         const accountMap = localRead('accountMap') === ''
             ? {} : JSON.parse(localRead('accountMap'))
 
-        const walletIndex = list.findIndex(({address}) => address === this.address)
+        const walletIndex = list.findIndex(({ address }) => address === this.address)
         if (walletIndex === -1) throw new Error('The wallet was not found in the list')
         list.splice(walletIndex, 1)
         store.commit('SET_WALLET_LIST', list)
@@ -297,7 +297,7 @@ export class AppWallet {
 
     async setAccountInfo(store: Store<AppState>): Promise<void> {
         try {
-            const {EMPTY_LINKED_ACCOUNT_KEY} = networkConfig
+            const { EMPTY_LINKED_ACCOUNT_KEY } = networkConfig
             const accountInfo = await new AccountHttp(store.state.account.node)
                 .getAccountInfo(Address.createFromRawAddress(store.state.account.wallet.address))
                 .toPromise()
@@ -326,8 +326,8 @@ export class AppWallet {
      * @param store
      */
     createAndStoreRemoteAccount(password: string,
-                                privateKey: string | false,
-                                store: Store<AppState>
+        privateKey: string | false,
+        store: Store<AppState>
     ): string {
         if (!this.checkPassword(password)) throw new Error('The password does not match the wallet password')
         const _password = new Password(password)
@@ -336,7 +336,7 @@ export class AppWallet {
             ? Account.createFromPrivateKey(privateKey, this.networkType)
             : Account.generateNewAccount(this.networkType)
 
-        const {publicKey} = account
+        const { publicKey } = account
         const _privateKey = account.privateKey
         if (this.linkedAccountKey && this.linkedAccountKey !== publicKey) {
             throw new Error('The public key is not matching the current linked account key')
@@ -352,7 +352,7 @@ export class AppWallet {
         return _privateKey
     }
 
-    updateWalletName( newWalletName: string, store: Store<AppState> ) {
+    updateWalletName(newWalletName: string, store: Store<AppState>) {
         this.name = newWalletName
         this.updateWallet(store)
     }
@@ -364,10 +364,10 @@ export class AppWallet {
         if (!localData.length) throw new Error('error at update wallet, no wallets in storage')
 
         const newWalletList = [...localData]
-        const newWalletIndex = newWalletList.findIndex(({address}) => address === this.address)
+        const newWalletIndex = newWalletList.findIndex(({ address }) => address === this.address)
         if (newWalletIndex === -1) throw new Error('wallet not found when updating')
 
-        const updatedList = Object.assign([], newWalletList, {[newWalletIndex]: this})
+        const updatedList = Object.assign([], newWalletList, { [newWalletIndex]: this })
         store.commit('SET_WALLET_LIST', updatedList)
         if (store.state.account.wallet.address === this.address) store.commit('SET_WALLET', this)
         accountMap[accountName].wallets = updatedList
@@ -378,10 +378,10 @@ export class AppWallet {
         try {
             const multisigAccountInfo = await new MultisigHttp(node)
                 .getMultisigAccountInfo(Address.createFromRawAddress(this.address)).toPromise()
-            store.commit('SET_MULTISIG_ACCOUNT_INFO', {address: this.address, multisigAccountInfo})
+            store.commit('SET_MULTISIG_ACCOUNT_INFO', { address: this.address, multisigAccountInfo })
             store.commit('SET_MULTISIG_LOADING', false)
         } catch (error) {
-            store.commit('SET_MULTISIG_ACCOUNT_INFO', {address: this.address, multisigAccountInfo: null})
+            store.commit('SET_MULTISIG_ACCOUNT_INFO', { address: this.address, multisigAccountInfo: null })
             store.commit('SET_MULTISIG_LOADING', false)
         }
     }
@@ -400,7 +400,7 @@ export class AppWallet {
         signedTransaction: SignedTransaction | CosignatureSignedTransaction,
         store: Store<AppState>,
         signedLock?: SignedTransaction,
-        ): void {
+    ): void {
         if (signedTransaction instanceof CosignatureSignedTransaction) {
             this.announceCosignature(signedTransaction, store)
             return
@@ -415,7 +415,7 @@ export class AppWallet {
     }
 
     announceCosignature(signedTransaction: CosignatureSignedTransaction, store: Store<AppState>): void {
-        const {node} = store.state.account
+        const { node } = store.state.account
         Log.create('announceCosignature', signedTransaction, store)
 
         new TransactionHttp(node).announceAggregateBondedCosignature(signedTransaction).subscribe(
@@ -428,7 +428,7 @@ export class AppWallet {
     }
 
     announceNormal(signedTransaction: SignedTransaction, store: Store<AppState>): void {
-        const {node} = store.state.account
+        const { node } = store.state.account
         Log.create('announceNormal', signedTransaction, store)
 
         new TransactionHttp(node).announce(signedTransaction).subscribe(
@@ -442,17 +442,17 @@ export class AppWallet {
         signedLock: SignedTransaction,
         store: Store<AppState>,
     ): void {
-        const {node} = store.state.account
+        const { node } = store.state.account
         const transactionHttp = new TransactionHttp(node)
         const listener = new Listener(node.replace('http', 'ws'), WebSocket)
-        Log.create('announceBonded', {signedTransaction, signedLock}, store)
+        Log.create('announceBonded', { signedTransaction, signedLock }, store)
 
         listener.open().then(() => new Promise((resolve, reject) => {
             transactionHttp
                 .announce(signedLock)
                 .subscribe(
-                    (_) =>  Notice.trigger(Message.SUCCESS, NoticeType.success, store),
-                    error =>  reject(error),
+                    (_) => Notice.trigger(Message.SUCCESS, NoticeType.success, store),
+                    error => reject(error),
                 )
 
             listener
@@ -480,7 +480,7 @@ export class AppWallet {
             signedLock: SignedTransaction,
         } {
         const account = this.getAccount(new Password(password))
-        const {networkCurrency, generationHash} = store.state.account
+        const { networkCurrency, generationHash } = store.state.account
         const signedTransaction = account.sign(aggregateTransaction, generationHash)
 
         const hashLockTransaction = HashLockTransaction
@@ -525,5 +525,17 @@ export class AppWallet {
 
     get publicAccount(): PublicAccount {
         return PublicAccount.createFromPublicKey(this.publicKey, this.networkType)
+    }
+
+    async refreshImportance(store: Store<AppState>): Promise<void> {
+        try {
+            const accountInfo = await new AccountHttp(store.state.account.node)
+                .getAccountInfo(Address.createFromRawAddress(store.state.account.wallet.address))
+                .toPromise()
+            this.importance = accountInfo.importance.compact();            
+            this.updateWallet(store);
+        } catch (error) {
+            console.error("AppWallet -> setAccountInfo -> error", error);
+        }
     }
 }

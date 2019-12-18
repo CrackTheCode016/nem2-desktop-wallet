@@ -166,4 +166,8 @@ export class WalletDetailsTs extends Vue {
             })
         })
     }
+
+    refreshImportance() {
+        this.activeAccount.wallet.refreshImportance(this.$store);
+    }
 }
