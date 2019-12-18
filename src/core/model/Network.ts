@@ -41,11 +41,11 @@ export class Network {
             this.setChainHeight(),
             this.setNodeNetworkType(),
          ])
-
          this.declareConnectionSuccessful(endpoint)
 
          if (initialGenerationHash !== this.generationHash) await this.switchGenerationHash()
       } catch (error) {
+          this.store.commit('SET_NODE_LOADING', false)
          console.error("Network -> error", error)
       }
    }

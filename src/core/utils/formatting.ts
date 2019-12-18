@@ -18,3 +18,4 @@ export const formatAddress = function (address: string): string {
 export const formatExplorerUrl = (transactionHash) => {
     return explorerUrlHead + transactionHash
 }
+

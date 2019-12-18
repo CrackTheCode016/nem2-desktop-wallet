@@ -1,8 +1,8 @@
 import {Message, isWindows} from "@/config/index.ts"
 import monitorSelected from '@/common/img/window/windowSelected.png'
 import monitorUnselected from '@/common/img/window/windowUnselected.png'
-import {localRead, localSave} from "@/core/utils"
-import {Component, Vue} from 'vue-property-decorator'
+import {completeUrlWithHostAndProtocol, localRead, localSave} from "@/core/utils"
+import {Component, Provide, Vue} from 'vue-property-decorator'
 import {windowSizeChange, minWindow, maxWindow, unMaximize, closeWindow} from '@/core/utils/electron.ts'
 import {mapState} from 'vuex'
 import {NetworkType} from "nem2-sdk"
@@ -10,8 +10,13 @@ import {languageConfig} from "@/config/view/language"
 import {nodeListConfig} from "@/config/view/node"
 import {StoreAccount, AppWallet, AppInfo, Endpoint} from "@/core/model"
 import routes from '@/router/routers'
+import {validation} from "@/core/validation"
+import ErrorTooltip from '@/components/other/forms/errorTooltip/ErrorTooltip.vue'
 
 @Component({
+    components: {
+        ErrorTooltip
+    },
     computed: {
         ...mapState({
             activeAccount: 'account',
@@ -20,6 +25,8 @@ import routes from '@/router/routers'
     }
 })
 export class MenuBarTs extends Vue {
+    @Provide() validator: any = this.$validator
+    validation = validation
     app: AppInfo
     nodeList: Endpoint[] = [] // @TODO: review node list
     activeAccount: StoreAccount
@@ -32,6 +39,7 @@ export class MenuBarTs extends Vue {
     languageList = languageConfig
     NetworkType = NetworkType
     closeWindow = closeWindow
+    isShowNodeList = false
 
     get routes() {
         return routes[0].children
@@ -95,11 +103,15 @@ export class MenuBarTs extends Vue {
         return this.app.nodeLoading
     }
 
+    refreshValidate() {
+        this.inputNodeValue = ''
+        this.$validator.reset()
+    }
+
     navigationIconClicked(route: any): void {
         if (!this.walletList.length) return
         if (this.$route.matched.map(({path}) => path).includes(route.path)) return
-        this.$router.push(route.path).catch(err => {
-        })
+        this.$router.push(route.path)
     }
 
     accountQuit() {
@@ -127,41 +139,40 @@ export class MenuBarTs extends Vue {
         localSave('nodeList', JSON.stringify(this.nodeList))
     }
 
-    async selectEndpoint(index) {
+    selectEndpoint(index) {
         if (this.node == this.nodeList[index].value) return
-        this.nodeList.forEach(item => item.isSelected = false)
+        this.nodeList = this.nodeList.map(item => {
+            item.isSelected = false
+            return item
+        })
         this.nodeList[index].isSelected = true
         this.$store.commit('SET_NODE', this.nodeList[index].value)
+        this.refreshValidate()
+
     }
 
-    checkNodeInput() {
+    switchToNewNode() {
         let {nodeList, inputNodeValue} = this
-        if (inputNodeValue == '') {
-            this.$Message.destroy()
-            this.$Message.error(this['$t'](Message.NODE_NULL_ERROR))
-            return false
-        }
-        const flag = nodeList.find(item => item.url == inputNodeValue)
-        if (flag) {
-            this.$Message.destroy()
-            this.$Message.error(this['$t'](Message.NODE_EXISTS_ERROR))
-            return false
-        }
-        return true
-    }
-
-    // @VEEVALIDATE
-    changeEndpointByInput() {
-        let {nodeList, inputNodeValue} = this
-        if (!this.checkNodeInput()) return
-        nodeList.push({
-            value: `${inputNodeValue}`,
+        this.nodeList.unshift({
+            value: inputNodeValue,
             name: inputNodeValue,
             url: inputNodeValue,
-            isSelected: false,
+            isSelected: true,
         })
-        this.nodeList = nodeList
+        this.selectEndpoint(0)
         localSave('nodeList', JSON.stringify(nodeList))
+    }
+
+    // @VEE-VALIDATE
+    changeEndpointByInput() {
+        let {nodeList, inputNodeValue} = this
+        this.$validator
+            .validate()
+            .then((valid) => {
+                if (!valid) return
+                this.inputNodeValue = completeUrlWithHostAndProtocol(inputNodeValue)
+                this.switchToNewNode()
+            })
     }
 
     initNodeList() {
