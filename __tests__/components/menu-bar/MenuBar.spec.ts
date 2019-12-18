@@ -12,6 +12,13 @@ import VueRx from "vue-rx"
 import moment from 'vue-moment'
 import i18n from "@/language"
 import flushPromises from 'flush-promises'
+import {AppWallet, CurrentAccount} from "@/core/model"
+import {
+    hdAccount,
+    // @ts-ignore
+} from "@@/mock/conf/conf.spec"
+import appStore from '@/store/index.ts'
+import {NetworkProperties} from '@/core/model/NetworkProperties.ts'
 // @ts-ignore
 const localVue = createLocalVue()
 const router = new VueRouter()
@@ -38,11 +45,16 @@ describe('MenuBar', () => {
             store = store = new Vuex.Store({
                     modules: {
                         account: {
-                            state: accountState.state,
+                            state: Object.assign(accountState.state, {
+                                wallet: new AppWallet(hdAccount.wallets[0]),
+                                currentAccount: new CurrentAccount(null, hdAccount.password, hdAccount.networkType)
+                            }),
                             mutations: accountMutations.mutations
                         },
                         app: {
-                            state: appState.state,
+                            state: Object.assign(appState.state, {
+                                NetworkProperties: NetworkProperties.create(appStore)
+                            }),
                             mutations: appMutations.mutations
                         }
                     }

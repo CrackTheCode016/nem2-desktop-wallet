@@ -47,8 +47,17 @@ export class MenuBarTs extends Vue {
             .map(({path, meta}) => ({path, meta}))
     }
 
+    get NetworkProperties() {
+        return this.app.NetworkProperties
+    }
+
     get isNodeHealthy() {
-        return this.app.isNodeHealthy
+        if (!this.NetworkProperties) return true
+        return this.NetworkProperties.healthy
+    }
+
+    get nodeNetworkType() {
+        return this.NetworkProperties.networkType
     }
 
     get wallet() {
@@ -71,14 +80,10 @@ export class MenuBarTs extends Vue {
         return this.$i18n.locale
     }
 
-    get nodeNetworkType() {
-        return this.app.nodeNetworkType
-    }
-
     get nodeNetworkTypeText() {
-        const {nodeNetworkType} = this
-        if (!this.isNodeHealthy) return this.$t('Invalid_node')
-        return nodeNetworkType ? NetworkType[nodeNetworkType] : this.$t('Loading')
+        const {healthy, networkType} = this.app.NetworkProperties
+        if (!healthy) return this.$t('Invalid_node')
+        return networkType ? NetworkType[networkType] : this.$t('Loading')
     }
 
     set language(lang) {
@@ -100,7 +105,7 @@ export class MenuBarTs extends Vue {
     }
 
     get nodeLoading() {
-        return this.app.nodeLoading
+        return this.app.NetworkProperties.loading
     }
 
     refreshValidate() {

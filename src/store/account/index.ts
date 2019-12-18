@@ -15,7 +15,6 @@ const state: StoreAccount = {
     mosaics: {},
     namespaces: [],
     addressAliasMap: {},
-    generationHash: '',
     transactionList: [],
     currentAccount: CurrentAccount.default(),
     transactionsToCosign: [],
@@ -109,9 +108,6 @@ const mutations: MutationTree<StoreAccount> = {
     SET_NODE(state: StoreAccount, node: string): void {
         state.node = node
         localSave('activeNode',node)
-    },
-    SET_GENERATION_HASH(state: StoreAccount, generationHash: string): void {
-        state.generationHash = generationHash
     },
     SET_ADDRESS_ALIAS_MAP(state: StoreAccount, addressAliasMap: any): void {
         state.addressAliasMap = addressAliasMap
