@@ -84,7 +84,7 @@
                         v-model="inputNodeValue"
                         :placeholder="$t('please_enter_a_custom_nod_address')">
                     </ErrorTooltip>
-                    <span @click="changeEndpointByInput" class="sure_button radius pointer">+</span>
+                    <span @click="submitNodeInfo" class="sure_button radius pointer">+</span>
                   </div>
                 </div>
               </div>

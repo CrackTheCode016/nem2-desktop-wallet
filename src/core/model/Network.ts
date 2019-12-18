@@ -66,7 +66,7 @@ export class Network {
 
    private setGenerationHashAndNodeHealth(): void {
       const {store, endpoint} = this
-      const currentEndpoint = `${endpoint}`
+      const currentEndpoint = endpoint
       const that = this
 
       this.blockHttp

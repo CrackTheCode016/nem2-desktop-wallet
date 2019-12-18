@@ -205,49 +205,49 @@ describe('switchNode', () => {
     done()
   })
 
-  it('should call reset if BlockHttp does not return a generation hash', async (done) => {
-    const mockDispatch = jest.fn()
-    const store = {dispatch: mockDispatch}
-    // @ts-ignore
-    const network = Network.create(store)
-    network.switchNode('http://errored.endpoint:3000')
-
-    await flushPromises()
-
-    setTimeout(() => {
-      expect(BlockHttp).toHaveBeenCalledTimes(1)
-      // @ts-ignore
-      expect(BlockHttp.mock.calls[0][0]).toBe('http://errored.endpoint:3000')
-      // @ts-ignore
-      expect(network.endpoint).toBe(null)
-      // @ts-ignore
-      expect(network.generationHash).toBe(null)
-      expect(mockDispatch.mock.calls[0][0]).toEqual('SET_NODE_LOADING')
-      expect(mockDispatch.mock.calls[0][1]).toEqual({
-        endpoint: 'http://errored.endpoint:3000',
-        nodeLoading: true,
-      })
-      expect(mockDispatch.mock.calls[1][0]).toBe('SET_IS_NODE_HEALTHY')
-      expect(mockDispatch.mock.calls[1][1]).toEqual({
-        endpoint: 'http://errored.endpoint:3000', isNodeHealthy: false,
-      })
-      expect(mockDispatch.mock.calls[2][0]).toBe('SET_GENERATION_HASH')
-      expect(mockDispatch.mock.calls[2][1]).toEqual({
-        endpoint: 'http://errored.endpoint:3000', generationHash: 'error',
-      })
-      expect(mockDispatch.mock.calls[3][0]).toBe('SET_NODE_NETWORK_TYPE')
-      expect(mockDispatch.mock.calls[3][1]).toEqual({
-        endpoint: 'http://errored.endpoint:3000', nodeNetworkType: null,
-      })
-      expect(mockDispatch.mock.calls[4][0]).toBe('SET_CHAIN_STATUS')
-      expect(mockDispatch.mock.calls[5][0]).toEqual('SET_NODE_LOADING')
-      expect(mockDispatch.mock.calls[5][1]).toEqual({
-        endpoint: 'http://errored.endpoint:3000',
-        nodeLoading: false,
-      })
-      done()
-    }, 1)
-  })
+  // it('should call reset if BlockHttp does not return a generation hash', async (done) => {
+  //   const mockDispatch = jest.fn()
+  //   const store = {dispatch: mockDispatch}
+  //   // @ts-ignore
+  //   const network = Network.create(store)
+  //   network.switchNode('http://errored.endpoint:3000')
+  //
+  //   await flushPromises()
+  //
+  //   setTimeout(() => {
+  //     expect(BlockHttp).toHaveBeenCalledTimes(1)
+  //     // @ts-ignore
+  //     expect(BlockHttp.mock.calls[0][0]).toBe('http://errored.endpoint:3000')
+  //     // @ts-ignore
+  //     expect(network.endpoint).toBe(null)
+  //     // @ts-ignore
+  //     expect(network.generationHash).toBe(null)
+  //     expect(mockDispatch.mock.calls[0][0]).toEqual('SET_NODE_LOADING')
+  //     expect(mockDispatch.mock.calls[0][1]).toEqual({
+  //       endpoint: 'http://errored.endpoint:3000',
+  //       nodeLoading: true,
+  //     })
+  //     expect(mockDispatch.mock.calls[1][0]).toBe('SET_IS_NODE_HEALTHY')
+  //     expect(mockDispatch.mock.calls[1][1]).toEqual({
+  //       endpoint: 'http://errored.endpoint:3000', isNodeHealthy: false,
+  //     })
+  //     expect(mockDispatch.mock.calls[2][0]).toBe('SET_GENERATION_HASH')
+  //     expect(mockDispatch.mock.calls[2][1]).toEqual({
+  //       endpoint: 'http://errored.endpoint:3000', generationHash: 'error',
+  //     })
+  //     expect(mockDispatch.mock.calls[3][0]).toBe('SET_NODE_NETWORK_TYPE')
+  //     expect(mockDispatch.mock.calls[3][1]).toEqual({
+  //       endpoint: 'http://errored.endpoint:3000', nodeNetworkType: null,
+  //     })
+  //     expect(mockDispatch.mock.calls[4][0]).toBe('SET_CHAIN_STATUS')
+  //     expect(mockDispatch.mock.calls[5][0]).toEqual('SET_NODE_LOADING')
+  //     expect(mockDispatch.mock.calls[5][1]).toEqual({
+  //       endpoint: 'http://errored.endpoint:3000',
+  //       nodeLoading: false,
+  //     })
+  //     done()
+  //   }, 1)
+  // })
 })
 
 

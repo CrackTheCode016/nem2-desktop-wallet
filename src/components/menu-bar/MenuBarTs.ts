@@ -161,9 +161,8 @@ export class MenuBarTs extends Vue {
         localSave('nodeList', JSON.stringify(this.nodeList))
     }
 
-    // @VEE-VALIDATE
-    changeEndpointByInput() {
-        let {nodeList, inputNodeValue} = this
+    submitNodeInfo() {
+        let {inputNodeValue} = this
         this.$validator
             .validate()
             .then((valid) => {
