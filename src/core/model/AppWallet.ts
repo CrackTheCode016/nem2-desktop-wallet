@@ -392,9 +392,9 @@ export class AppWallet {
 
     /**
      * Routes a signedTransaction to the relevant announce method
-     * @param signedTransaction 
-     * @param store 
-     * @param signedLock 
+     * @param signedTransaction
+     * @param store
+     * @param signedLock
      */
     announceTransaction(
         signedTransaction: SignedTransaction | CosignatureSignedTransaction,
@@ -532,7 +532,8 @@ export class AppWallet {
             const accountInfo = await new AccountHttp(store.state.account.node)
                 .getAccountInfo(Address.createFromRawAddress(store.state.account.wallet.address))
                 .toPromise()
-            this.importance = accountInfo.importance.compact();            
+            this.importance = accountInfo.importance.compact();
+
             this.updateWallet(store);
         } catch (error) {
             console.error("AppWallet -> setAccountInfo -> error", error);

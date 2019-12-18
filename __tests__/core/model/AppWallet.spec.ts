@@ -1,13 +1,13 @@
 
-import {AppWallet} from '@/core/model/AppWallet.ts'
-import {from, throwError} from 'rxjs'
-import {tap, map, catchError, mapTo} from 'rxjs/operators'
+import { AppWallet } from '@/core/model/AppWallet.ts'
+import { from, throwError } from 'rxjs'
+import { tap, map, catchError, mapTo } from 'rxjs/operators'
 import * as sdk from 'nem2-sdk'
-import {config, createLocalVue} from '@vue/test-utils'
+import { config, createLocalVue } from '@vue/test-utils'
 import VueRouter from 'vue-router'
 import Vuex from 'vuex'
-import {appState} from '@/store/app'
-import {accountMutations, accountState} from '@/store/account'
+import { appState } from '@/store/app'
+import { accountMutations, accountState } from '@/store/account'
 import VueRx from "vue-rx"
 import moment from 'vue-moment'
 import {
@@ -30,12 +30,13 @@ localVue.directive('focus', {
         el.focus()
     }
 })
-import {Message} from '@/config'
-import {Log, Notice, NoticeType} from '@/core/model'
+import { Message } from '@/config'
+import { Log, Notice, NoticeType } from '@/core/model'
 jest.mock('@/core/model/Log')
 jest.mock('@/core/model/Notice')
 
 // close warning
+// @ts-ignore
 config.logModifiedComponents = false
 
 describe('AppWallet', () => {
@@ -52,7 +53,7 @@ describe('AppWallet', () => {
                     mutations: accountMutations.mutations
                 },
                 app: {
-                    state: Object.assign(appState.state, {mosaicsLoading}),
+                    state: Object.assign(appState.state, { mosaicsLoading }),
                     mutations: {}
                 }
             }
@@ -168,6 +169,40 @@ describe('AppWallet', () => {
         const appWallet = new AppWallet(hdAccount.wallets[0])
         expect(appWallet.publicAccount).toEqual(PublicAccount.createFromPublicKey(appWallet.publicKey, appWallet.networkType))
     })
+
+    it('refreshImportance should not change other data except importance', () => {
+        const appWallet = new AppWallet(hdAccount.wallets[0])
+
+        // copy value from appWallet
+        const coptWallet = {
+            name: appWallet.name,
+            simpleWallet: appWallet.simpleWallet,
+            address: appWallet.address,
+            publicKey: appWallet.publicKey,
+            networkType: appWallet.networkType,
+            active: appWallet.active,
+            balance: appWallet.balance,
+            encryptedMnemonic: appWallet.encryptedMnemonic,
+            path: appWallet.path,
+            sourceType: appWallet.sourceType,
+            importance: appWallet.importance,
+            linkedAccountKey: appWallet.linkedAccountKey,
+            remoteAccount: appWallet.remoteAccount,
+        }        
+
+        expect(coptWallet.name).toStrictEqual(appWallet.name);
+        expect(coptWallet.simpleWallet).toStrictEqual(appWallet.simpleWallet);
+        expect(coptWallet.address).toStrictEqual(appWallet.address);
+        expect(coptWallet.publicKey).toStrictEqual(appWallet.publicKey);
+        expect(coptWallet.networkType).toStrictEqual(appWallet.networkType);
+        expect(coptWallet.active).toStrictEqual(appWallet.active);
+        expect(coptWallet.balance).toStrictEqual(appWallet.balance);
+        expect(coptWallet.encryptedMnemonic).toStrictEqual(appWallet.encryptedMnemonic);
+        expect(coptWallet.path).toStrictEqual(appWallet.path);
+        expect(coptWallet.sourceType).toStrictEqual(appWallet.sourceType);
+        expect(coptWallet.remoteAccount).toStrictEqual(appWallet.remoteAccount);
+        expect(coptWallet.linkedAccountKey).toStrictEqual(appWallet.linkedAccountKey);
+    })
 })
 
 const publicKey = '30CA0A8179477777AB3407611405EAAE6C4BA12156035E4DF8A73BD7651D6D9C'
@@ -231,9 +266,9 @@ describe('announceTransaction', () => {
     });
 });
 
-import {TransactionHttp} from 'nem2-sdk/dist/src/infrastructure/TransactionHttp'
-import {Listener} from 'nem2-sdk/dist/src/infrastructure/Listener'
-import {TransactionInfo, UInt64, Address, PublicAccount, NetworkType} from 'nem2-sdk'
+import { TransactionHttp } from 'nem2-sdk/dist/src/infrastructure/TransactionHttp'
+import { Listener } from 'nem2-sdk/dist/src/infrastructure/Listener'
+import { TransactionInfo, UInt64, Address, PublicAccount, NetworkType } from 'nem2-sdk'
 import flushPromises from 'flush-promises'
 const mockAnnounceAggregateBondedCosignatureCall = jest.fn()
 const mockAnnounceCall = jest.fn()
@@ -313,7 +348,7 @@ describe('valid transactions announces', () => {
     const cosignatureSignedTransaction = new sdk.CosignatureSignedTransaction(hash, '', publicKey)
     const signedTransaction = new sdk.SignedTransaction('signed tx', hash, publicKey, 1, sdk.NetworkType.TEST_NET)
     const store = {
-        state: {account: {node: 'http://localhost:3000'}},
+        state: { account: { node: 'http://localhost:3000' } },
         commit: mockCommit,
     }
 
@@ -380,7 +415,7 @@ describe('valid transactions announces', () => {
         expect(mockAnnounceAggregateBondedCall.mock.calls[0][0]).toEqual(signedTransaction)
         expect(mockLogCreate).toHaveBeenCalledTimes(1)
         expect(mockLogCreate.mock.calls[0][0]).toBe('announceBonded')
-        expect(mockLogCreate.mock.calls[0][1]).toEqual({signedTransaction, signedLock: signedLockWithInfo})
+        expect(mockLogCreate.mock.calls[0][1]).toEqual({ signedTransaction, signedLock: signedLockWithInfo })
         expect(mockLogCreate.mock.calls[0][2]).toEqual(store)
         done()
     })
@@ -402,7 +437,7 @@ describe('invalid transactions announces', () => {
     const appWallet = new AppWallet(hdAccount.wallets[0])
 
     const store = {
-        state: {account: {node: 'http://localhost:3000'}},
+        state: { account: { node: 'http://localhost:3000' } },
         commit: mockCommit,
     }
 
@@ -457,7 +492,7 @@ describe('invalid transactions announces', () => {
         expect(mockAnnounceCall.mock.calls[0][0]).toBe('throw')
         expect(mockLogCreate).toHaveBeenCalledTimes(2)
         expect(mockLogCreate.mock.calls[0][0]).toBe('announceBonded')
-        expect(mockLogCreate.mock.calls[0][1]).toEqual({signedTransaction, signedLock: 'throw'})
+        expect(mockLogCreate.mock.calls[0][1]).toEqual({ signedTransaction, signedLock: 'throw' })
         expect(mockLogCreate.mock.calls[0][2]).toEqual(store)
         expect(mockLogCreate.mock.calls[1][0]).toBe('announceBonded -> error')
         expect(mockLogCreate.mock.calls[1][1]).not.toBe(undefined)
@@ -476,7 +511,7 @@ describe('invalid transactions announces', () => {
         expect(mockAnnounceCall.mock.calls[0][0]).toBe(signedLockWithInfo)
         expect(mockLogCreate).toHaveBeenCalledTimes(2)
         expect(mockLogCreate.mock.calls[0][0]).toBe('announceBonded')
-        expect(mockLogCreate.mock.calls[0][1]).toEqual({signedTransaction: 'throw', signedLock: signedLockWithInfo})
+        expect(mockLogCreate.mock.calls[0][1]).toEqual({ signedTransaction: 'throw', signedLock: signedLockWithInfo })
         expect(mockLogCreate.mock.calls[0][2]).toEqual(store)
         expect(mockLogCreate.mock.calls[1][0]).toBe('announceBonded -> error')
         expect(mockLogCreate.mock.calls[1][1]).not.toBe(undefined)
@@ -487,7 +522,7 @@ describe('invalid transactions announces', () => {
 
 describe('getSignedLockAndAggregateTransaction', () => {
     const appWallet = new AppWallet(hdAccount.wallets[0])
-    const store = {state: {account: {networkCurrency, generationHash: hash}}}
+    const store = { state: { account: { networkCurrency, generationHash: hash } } }
 
     const transaction = sdk.TransferTransaction.create(
         sdk.Deadline.create(),
@@ -506,7 +541,7 @@ describe('getSignedLockAndAggregateTransaction', () => {
     )
 
     it('should return a signedTransaction and an signedLock', () => {
-        const {signedTransaction, signedLock} = appWallet.getSignedLockAndAggregateTransaction(
+        const { signedTransaction, signedLock } = appWallet.getSignedLockAndAggregateTransaction(
             aggregateTransaction,
             1,
             'password',
