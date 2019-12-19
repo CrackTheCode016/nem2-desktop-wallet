@@ -21,7 +21,7 @@ import TheWalletDelete from '@/views/wallet/wallet-switch/the-wallet-delete/TheW
         KeystoreDialog,
         WalletHarvesting,
         TheWalletUpdate,
-        TheWalletDelete
+        TheWalletDelete,
     },
     computed: {
         ...mapState({

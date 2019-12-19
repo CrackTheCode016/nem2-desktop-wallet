@@ -7,8 +7,7 @@
           <span class="address">
             {{address}}
           </span>
-          <img class="pointer" @click="copyAddress"
-               src="@/common/img/monitor/monitorCopyAddress.png" alt="">
+          <img class="pointer" @click="copyAddress" src="@/common/img/monitor/monitorCopyAddress.png">
         </div>
 
         <div class="split"></div>
