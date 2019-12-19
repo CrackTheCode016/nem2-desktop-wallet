@@ -12,12 +12,12 @@
   @Component
   export default class NumberFormatting extends Vue {
 
-    @Prop({default: 0})
-    numberOfFormatting: string
+    @Prop({default: '0'})
+    numberOfFormatting: string | number
 
     get pointIndex() {
       const pointFlag = this.numberOfFormatting.toString().indexOf('.')
-      return pointFlag == -1 ? this.numberOfFormatting.length : pointFlag
+      return pointFlag == -1 ? this.numberOfFormatting.toString().length : pointFlag
     }
 
     get integer() {

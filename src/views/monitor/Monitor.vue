@@ -82,7 +82,7 @@
                 </span>
                 <span class="mosaic_name text_select">{{mosaic.name || mosaic.hex}}</span>
                 <span class="mosaic_value">
-                   <NumberFormatting :numberOfFormatting="formatNumber(mosaic.balance || 0)"></NumberFormatting>
+                   <NumberFormatting :numberOfFormatting="formatNumber(mosaic.balance || '0')"></NumberFormatting>
                 </span>
               </div>
               <div class="complete_container">
