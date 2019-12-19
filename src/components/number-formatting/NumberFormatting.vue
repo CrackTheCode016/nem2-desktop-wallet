@@ -6,31 +6,32 @@
 </template>
 
 <script lang="ts">
-    import {Component, Prop, Vue} from 'vue-property-decorator'
+  import {Component, Prop, Vue} from 'vue-property-decorator'
 
 
-    @Component
-    export default class NumberFormatting extends Vue {
+  @Component
+  export default class NumberFormatting extends Vue {
 
-        @Prop({default: 0})
-        numberOfFormatting: number
+    @Prop({default: 0})
+    numberOfFormatting: string
 
-        get pointIndex() {
-            return this.numberOfFormatting.toString().indexOf('.')
-        }
-
-        get integer() {
-            return this.numberOfFormatting.toString().substring(0, this.pointIndex)
-        }
-
-        get decimals() {
-            return this.numberOfFormatting.toFixed(this.pointIndex)
-        }
-
+    get pointIndex() {
+      const pointFlag = this.numberOfFormatting.indexOf('.')
+      return pointFlag == -1 ? this.numberOfFormatting.length : pointFlag
     }
+
+    get integer() {
+      return this.numberOfFormatting.substring(0, this.pointIndex)
+    }
+
+    get decimals() {
+      return this.numberOfFormatting.substring(this.pointIndex)
+    }
+
+  }
 </script>
 <style scoped lang="less">
   .lighter-color {
-    opacity: .8;
+    opacity: .4;
   }
 </style>

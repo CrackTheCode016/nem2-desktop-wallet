@@ -16,7 +16,7 @@
           <div class="amount"><NumberFormatting :numberOfFormatting="formatNumber(balance)"></NumberFormatting></div>
         </div>
         <div class="exchange">
-          {{ xemUsdPrice > 0 ? `$${formatNumber(balance*xemUsdPrice)}` : '' }}
+          <NumberFormatting :numberOfFormatting="xemUsdPrice > 0 ? `$${formatNumber(balance*xemUsdPrice)}` : ''"></NumberFormatting>
         </div>
       </div>
       <div class="bottom_account_info radius" ref="bottomAccountInfo">
@@ -39,14 +39,13 @@
                   </span>
                   <span class="mosaic_name">{{mosaic.name || mosaic.hex}}</span>
                   <span class="mosaic_value">
-                    <div>{{formatNumber(mosaic.balance || 0)}}</div>
+                     <NumberFormatting :numberOfFormatting="formatNumber(mosaic.balance || 0)"></NumberFormatting>
                   </span>
                 </div>
               </div>
             </TabPane>
           </Tabs>
 
-          <!--        sevral      -->
           <div v-if="isShowManageMosaicIcon" class="searchMosaic secondary_page_animate">
             <img src="@/common/img/monitor/monitorLeftArrow.png" class="asset_setting_tit pointer"
                  @click="showMosaicMap" alt="">
@@ -83,7 +82,7 @@
                 </span>
                 <span class="mosaic_name text_select">{{mosaic.name || mosaic.hex}}</span>
                 <span class="mosaic_value">
-                  <div>{{formatNumber(mosaic.balance || 0)}}</div>
+                   <NumberFormatting :numberOfFormatting="formatNumber(mosaic.balance || 0)"></NumberFormatting>
                 </span>
               </div>
               <div class="complete_container">

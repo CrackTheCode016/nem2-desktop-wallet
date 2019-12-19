@@ -1,7 +1,7 @@
 import {copyTxt} from '@/core/utils'
 import {ContactQR} from 'nem2-qr-library'
 import {AliasType, MultisigAccountInfo, PublicAccount} from 'nem2-sdk'
-import {Component, Vue, Watch} from 'vue-property-decorator'
+import {Component, Vue} from 'vue-property-decorator'
 import KeystoreDialog from '@/views/wallet/wallet-details/keystore-dialog/KeystoreDialog.vue'
 import PrivatekeyDialog from '@/views/wallet/wallet-details/privatekey-dialog/PrivatekeyDialog.vue'
 import WalletHarvesting from '@/views/wallet/wallet-details/wallet-function/wallet-harvesting/WalletHarvesting.vue'
