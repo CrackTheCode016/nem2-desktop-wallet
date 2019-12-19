@@ -13,7 +13,7 @@
         <div class="split"></div>
         <div class="XEM_amount overflow_ellipsis">
           <div>{{ticker}}</div>
-          <div class="amount">{{formatNumber(balance)}}</div>
+          <div class="amount"><NumberFormatting :numberOfFormatting="formatNumber(balance)"></NumberFormatting></div>
         </div>
         <div class="exchange">
           {{ xemUsdPrice > 0 ? `$${formatNumber(balance*xemUsdPrice)}` : '' }}
