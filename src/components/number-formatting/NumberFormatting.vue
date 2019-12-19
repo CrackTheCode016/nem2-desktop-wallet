@@ -16,16 +16,16 @@
     numberOfFormatting: string
 
     get pointIndex() {
-      const pointFlag = this.numberOfFormatting.indexOf('.')
+      const pointFlag = this.numberOfFormatting.toString().indexOf('.')
       return pointFlag == -1 ? this.numberOfFormatting.length : pointFlag
     }
 
     get integer() {
-      return this.numberOfFormatting.substring(0, this.pointIndex)
+      return this.numberOfFormatting.toString().substring(0, this.pointIndex)
     }
 
     get decimals() {
-      return this.numberOfFormatting.substring(this.pointIndex)
+      return this.numberOfFormatting.toString().substring(this.pointIndex)
     }
 
   }
