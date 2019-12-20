@@ -10,7 +10,7 @@ import {nodeListConfig} from "@/config/view/node"
 import {localRead, localSave} from "@/core/utils"
 
 const state: StoreAccount = {
-    node: localRead('activeNode') || nodeListConfig[0].value,
+    node: '',
     wallet: null,
     mosaics: {},
     namespaces: [],
