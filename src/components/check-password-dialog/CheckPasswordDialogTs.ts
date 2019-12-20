@@ -25,9 +25,7 @@ export class CheckPasswordDialogTs extends Vue {
     }
 
     set show(val) {
-        if (!val) {
             this.$emit('close')
-        }
     }
 
     get accountPassword() {

@@ -1,14 +1,19 @@
 import {Message} from "@/config/index.ts"
-import {Component, Vue, Prop} from 'vue-property-decorator'
+import {Component, Vue, Prop, Provide} from 'vue-property-decorator'
 import {mapState} from 'vuex'
 import {AppAccounts, AppWallet, StoreAccount} from "@/core/model"
+import ErrorTooltip from '@/components/other/forms/errorTooltip/ErrorTooltip.vue'
+import {validation} from "@/core/validation"
 
 @Component({
     computed: {
-        ...mapState({activeAccount: 'account', app: 'app'})
-    }
+        ...mapState({activeAccount: 'account', app: 'app'}),
+    },
+  components: {ErrorTooltip},
 })
 export class TheWalletDeleteTs extends Vue {
+    @Provide() validator: any = this.$validator
+    validation = validation
     activeAccount: StoreAccount
     app: any
     password:string=''
@@ -18,6 +23,10 @@ export class TheWalletDeleteTs extends Vue {
 
     @Prop()
     walletToDelete: AppWallet
+
+  get accountPassword() {
+    return this.activeAccount.currentAccount.password
+  }
 
   get visible(){
       return this.showCheckPWDialog
@@ -52,27 +61,32 @@ export class TheWalletDeleteTs extends Vue {
     }
 
     deleteByPassword() {
-        if(this.walletList.length == 1) {
-           AppAccounts().deleteAccount(this.activeAccount.currentAccount.name)
+      this.$validator
+        .validate()
+        .then((valid) => {
+          if(!valid) return
+          if (this.walletList.length == 1) {
+            AppAccounts().deleteAccount(this.activeAccount.currentAccount.name)
             this.accountQuit()
             return
-        }
-        try {
+          }
+          try {
             const isPasswordCorrect = new AppWallet(this.walletToDelete).checkPassword(this.password)
             if (isPasswordCorrect) {
-                new AppWallet(this.walletToDelete).delete(this.$store, this)
-                this.visible = false
-                return
+              new AppWallet(this.walletToDelete).delete(this.$store, this)
+              this.visible = false
+              return
             }
-              this.$Notice.error({
-                  title: this.$t(Message.WRONG_PASSWORD_ERROR) + ''
-              })
-
-        } catch (error) {
             this.$Notice.error({
-                title: this.$t(Message.WRONG_PASSWORD_ERROR) + ''
+              title: this.$t(Message.WRONG_PASSWORD_ERROR) + ''
             })
-        }
+
+          } catch (error) {
+            this.$Notice.error({
+              title: this.$t(Message.WRONG_PASSWORD_ERROR) + ''
+            })
+          }
+        })
     }
 
     deleteByWalletNameConfirmation() {
@@ -95,6 +109,7 @@ export class TheWalletDeleteTs extends Vue {
     }
 
     submit() {
+
         // based on source of wallet, use different protection mechanisms
         switch (this.getWallet.sourceType) {
             case 'Trezor':
