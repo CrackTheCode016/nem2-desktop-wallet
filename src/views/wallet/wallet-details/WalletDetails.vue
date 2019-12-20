@@ -35,7 +35,7 @@
                   <sup>{{(importance+'').length-1}}</sup>
                 </span>
                 <span v-else>0</span>
-                <span class="edit-wallet-name" @click.stop="refreshImportance">
+                <span class="edit-wallet-name" @click.stop="refreshImportance($store)">
                   <Icon type="md-refresh"/>
                 </span>
               </span>

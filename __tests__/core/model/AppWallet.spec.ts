@@ -1,13 +1,13 @@
 
-import { AppWallet } from '@/core/model/AppWallet.ts'
-import { from, throwError } from 'rxjs'
-import { tap, map, catchError, mapTo } from 'rxjs/operators'
+import {AppWallet} from '@/core/model/AppWallet.ts'
+import {from, throwError} from 'rxjs'
+import {tap, map, catchError, mapTo} from 'rxjs/operators'
 import * as sdk from 'nem2-sdk'
-import { config, createLocalVue } from '@vue/test-utils'
+import {config, createLocalVue} from '@vue/test-utils'
 import VueRouter from 'vue-router'
 import Vuex from 'vuex'
-import { appState } from '@/store/app'
-import { accountMutations, accountState } from '@/store/account'
+import {appState} from '@/store/app'
+import {accountMutations, accountState} from '@/store/account'
 import VueRx from "vue-rx"
 import moment from 'vue-moment'
 import {
@@ -55,7 +55,7 @@ describe('AppWallet', () => {
                     mutations: accountMutations.mutations
                 },
                 app: {
-                    state: Object.assign(appState.state, { mosaicsLoading }),
+                    state: Object.assign(appState.state, {mosaicsLoading}),
                     mutations: {}
                 }
             }
@@ -270,9 +270,9 @@ describe('announceTransaction', () => {
     });
 });
 
-import { TransactionHttp } from 'nem2-sdk/dist/src/infrastructure/TransactionHttp'
-import { Listener } from 'nem2-sdk/dist/src/infrastructure/Listener'
-import { TransactionInfo, UInt64, Address, PublicAccount, NetworkType } from 'nem2-sdk'
+import {TransactionHttp} from 'nem2-sdk/dist/src/infrastructure/TransactionHttp'
+import {Listener} from 'nem2-sdk/dist/src/infrastructure/Listener'
+import {TransactionInfo, UInt64, Address, PublicAccount, NetworkType} from 'nem2-sdk'
 import flushPromises from 'flush-promises'
 const mockAnnounceAggregateBondedCosignatureCall = jest.fn()
 const mockAnnounceCall = jest.fn()
@@ -352,7 +352,7 @@ describe('valid transactions announces', () => {
     const cosignatureSignedTransaction = new sdk.CosignatureSignedTransaction(hash, '', publicKey)
     const signedTransaction = new sdk.SignedTransaction('signed tx', hash, publicKey, 1, sdk.NetworkType.TEST_NET)
     const store = {
-        state: { account: { node: 'http://localhost:3000' } },
+        state: {account: {node: 'http://localhost:3000'}},
         commit: mockCommit,
     }
 
@@ -419,7 +419,7 @@ describe('valid transactions announces', () => {
         expect(mockAnnounceAggregateBondedCall.mock.calls[0][0]).toEqual(signedTransaction)
         expect(mockLogCreate).toHaveBeenCalledTimes(1)
         expect(mockLogCreate.mock.calls[0][0]).toBe('announceBonded')
-        expect(mockLogCreate.mock.calls[0][1]).toEqual({ signedTransaction, signedLock: signedLockWithInfo })
+        expect(mockLogCreate.mock.calls[0][1]).toEqual({signedTransaction, signedLock: signedLockWithInfo})
         expect(mockLogCreate.mock.calls[0][2]).toEqual(store)
         done()
     })
@@ -499,7 +499,7 @@ describe('invalid transactions announces', () => {
         expect(mockAnnounceCall.mock.calls[0][0]).toBe('throw')
         expect(mockLogCreate).toHaveBeenCalledTimes(2)
         expect(mockLogCreate.mock.calls[0][0]).toBe('announceBonded')
-        expect(mockLogCreate.mock.calls[0][1]).toEqual({ signedTransaction, signedLock: 'throw' })
+        expect(mockLogCreate.mock.calls[0][1]).toEqual({signedTransaction, signedLock: 'throw'})
         expect(mockLogCreate.mock.calls[0][2]).toEqual(store)
         expect(mockLogCreate.mock.calls[1][0]).toBe('announceBonded -> error')
         expect(mockLogCreate.mock.calls[1][1]).not.toBe(undefined)
@@ -518,7 +518,7 @@ describe('invalid transactions announces', () => {
         expect(mockAnnounceCall.mock.calls[0][0]).toBe(signedLockWithInfo)
         expect(mockLogCreate).toHaveBeenCalledTimes(2)
         expect(mockLogCreate.mock.calls[0][0]).toBe('announceBonded')
-        expect(mockLogCreate.mock.calls[0][1]).toEqual({ signedTransaction: 'throw', signedLock: signedLockWithInfo })
+        expect(mockLogCreate.mock.calls[0][1]).toEqual({signedTransaction: 'throw', signedLock: signedLockWithInfo})
         expect(mockLogCreate.mock.calls[0][2]).toEqual(store)
         expect(mockLogCreate.mock.calls[1][0]).toBe('announceBonded -> error')
         expect(mockLogCreate.mock.calls[1][1]).not.toBe(undefined)
@@ -553,7 +553,7 @@ describe('getSignedLockAndAggregateTransaction', () => {
     )
 
     it('should return a signedTransaction and an signedLock', () => {
-        const { signedTransaction, signedLock } = appWallet.getSignedLockAndAggregateTransaction(
+        const {signedTransaction, signedLock} = appWallet.getSignedLockAndAggregateTransaction(
             aggregateTransaction,
             1,
             'password',

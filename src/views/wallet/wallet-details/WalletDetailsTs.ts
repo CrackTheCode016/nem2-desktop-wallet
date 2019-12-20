@@ -54,6 +54,7 @@ export class WalletDetailsTs extends Vue {
     activeNamespace: AppNamespace = null
     showUpdateDialog = false
     showDeleteDialog = false
+    refreshImportance = this.activeAccount.wallet.refreshImportance
 
     get wallet(): AppWallet {
         return this.activeAccount.wallet
@@ -160,9 +161,5 @@ export class WalletDetailsTs extends Vue {
                 title: this['$t']('successful_copy') + ''
             })
         })
-    }
-
-    refreshImportance() {
-        this.activeAccount.wallet.refreshImportance(this.$store);
     }
 }
