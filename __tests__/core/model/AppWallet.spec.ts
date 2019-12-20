@@ -184,6 +184,7 @@ describe('AppWallet', () => {
     })
 
     it('refreshImportance should not change other data except importance', () => {
+        // @ts-ignore
         const appWallet = new AppWallet(hdAccount.wallets[0])
 
         // copy value from appWallet
