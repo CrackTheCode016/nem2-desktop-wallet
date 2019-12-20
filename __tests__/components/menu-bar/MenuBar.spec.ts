@@ -16,7 +16,7 @@ import {AppWallet, CurrentAccount} from "@/core/model"
 import {
     hdAccount,
     // @ts-ignore
-} from "@@/mock/conf/conf.spec"
+} from "@MOCKS/index"
 import appStore from '@/store/index.ts'
 import {NetworkProperties} from '@/core/model/NetworkProperties.ts'
 // @ts-ignore
@@ -46,6 +46,7 @@ describe('MenuBar', () => {
                     modules: {
                         account: {
                             state: Object.assign(accountState.state, {
+                              //@ts-ignore
                                 wallet: new AppWallet(hdAccount.wallets[0]),
                                 currentAccount: new CurrentAccount(null, hdAccount.password, hdAccount.networkType)
                             }),
