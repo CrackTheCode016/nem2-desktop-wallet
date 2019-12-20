@@ -90,7 +90,6 @@ export const defaultNetworkConfig = {
 }
 
 export const networkConfig = {
-
     targetBlockTime: 15,
     enableVerifiableState: true,
     enableVerifiableReceipts: true,

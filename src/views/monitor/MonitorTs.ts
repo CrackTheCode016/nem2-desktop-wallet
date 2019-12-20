@@ -7,7 +7,8 @@ import {mapState} from "vuex"
 import {AppInfo, MosaicNamespaceStatusType, StoreAccount} from "@/core/model"
 import routes from '@/router/routers'
 import numberGrow from '@/components/number-grow/NumberGrow.vue'
-
+import {networkConfig} from "@/config/index"
+const {targetBlockTime} = networkConfig
 @Component({
     components: {
         numberGrow,
@@ -31,7 +32,7 @@ export class MonitorTs extends Vue {
     monitorSelected = monitorSelected
     monitorUnselected = monitorUnselected
     formatNumber = formatNumber
-
+    defaultTargetBlockTime = targetBlockTime
     get balance(): number {
         const {wallet} = this.activeAccount
         if (!wallet) return 0
@@ -85,7 +86,7 @@ export class MonitorTs extends Vue {
     get NetworkProperties() {
         return this.app.NetworkProperties
     }
-    
+
     get routes() {
         const routesMeta: any[] = routes[0].children
             .find(({name}) => name === 'monitorPanel')
