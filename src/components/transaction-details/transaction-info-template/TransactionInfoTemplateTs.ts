@@ -14,7 +14,7 @@ import NumberFormatting from '@/components/number-formatting/NumberFormatting.vu
 })
 export class TransactionInfoTemplateTs extends Vue {
     activeAccount: StoreAccount
-    unusedAttributesList = [ 'from', 'cosignatories', 'hash', 'fee', 'max_fee', 'block', 'sender', 'transaction_type', 'self', 'aims', 'tag', 'mosaics', 'namespace', 'root_namespace' ]
+    unusedAttributesList = [ 'from', 'cosignatories', 'hash', 'fee', 'max_fee', 'block', 'sender', 'transaction_type','message', 'self', 'aims', 'tag', 'mosaics', 'namespace', 'root_namespace' ]
 
     getNamespaceNameFromNamespaceId = getNamespaceNameFromNamespaceId
     formatSenderOrRecipient = formatSenderOrRecipient
