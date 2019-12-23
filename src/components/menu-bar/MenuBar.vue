@@ -65,27 +65,36 @@
               <div slot="content">
                 <div class="node_list">
                   <div class="node_list_container scroll">
-                    <div @click="selectEndpoint(index)" class="point_item pointer" v-for="(p,index) in nodeList"
-                         :key="`sep${index}`">
-                      <img :src="p.value ==node? monitorSelected : monitorUnselected">
-                      <span class="node_url text_select">{{p.value}}</span>
-                      <img class="remove_icon" @click.stop="removeNode(index)"
+                    <div
+                      class="point_item pointer"
+                      v-for="(iterNode, index) in nodeList"
+                      :key="`sep${index}`"
+                      @click="node = iterNode.value"
+                    >
+                      <img :src="iterNode.value === node? monitorSelected : monitorUnselected">
+                      <span class="node_url text_select">{{iterNode.value}}</span>
+                      <img class="remove_icon" @click.stop="removeNode(node)"
                            src="@/common/img/service/multisig/multisigDelete.png">
                     </div>
                   </div>
 
-                  <div class="input_point point_item">
+                  <form
+                    class="input_point point_item"
+                    action="submit"
+                    onsubmit="event.preventDefault()"
+                    @keyup.enter="submit"
+                  >
                     <ErrorTooltip placementOverride="top" class="node-input-container" fieldName="friendlyNodeUrl">
                       <input
                         v-validate="validation.friendlyNodeUrl"
                         :data-vv-as="$t('node')"
                         data-vv-name="friendlyNodeUrl"
-                        placeholder="please input url here"
                         v-model="inputNodeValue"
-                        :placeholder="$t('please_enter_a_custom_nod_address')">
+                        :placeholder="$t('please_enter_a_custom_nod_address')"
+                      >
                     </ErrorTooltip>
-                    <span @click="submitNodeInfo" class="sure_button radius pointer">+</span>
-                  </div>
+                    <span @click="submit" class="sure_button radius pointer">+</span>
+                  </form>
                 </div>
               </div>
             </Poptip>
@@ -122,8 +131,3 @@
 
     }
 </script>
-
-<style scoped lang="less">
-
-</style>
-

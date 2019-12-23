@@ -1,14 +1,13 @@
-import {isWindows} from "@/config/index.ts"
+import {isWindows, Message} from "@/config/index.ts"
 import monitorSelected from '@/common/img/window/windowSelected.png'
 import monitorUnselected from '@/common/img/window/windowUnselected.png'
-import {completeUrlWithHostAndProtocol, localRead, localSave} from "@/core/utils"
+import {completeUrlWithHostAndProtocol, localSave} from "@/core/utils"
 import {Component, Provide, Vue} from 'vue-property-decorator'
 import {windowSizeChange, minWindow, maxWindow, unMaximize, closeWindow} from '@/core/utils/electron.ts'
 import {mapState} from 'vuex'
 import {NetworkType} from "nem2-sdk"
 import {languageConfig} from "@/config/view/language"
-import {defaultNodeList} from "@/config/view/node"
-import {StoreAccount, AppWallet, AppInfo, Endpoint} from "@/core/model"
+import {StoreAccount, AppWallet, AppInfo, Notice, NoticeType} from "@/core/model"
 import routes from '@/router/routers'
 import {validation} from "@/core/validation"
 import ErrorTooltip from '@/components/other/forms/errorTooltip/ErrorTooltip.vue'
@@ -29,7 +28,6 @@ export class MenuBarTs extends Vue {
     validation = validation
     app: AppInfo
     activeAccount: StoreAccount
-    showNodeList: boolean = false
     isWindows = isWindows
     inputNodeValue = ''
     isNowWindowMax = false
@@ -38,7 +36,6 @@ export class MenuBarTs extends Vue {
     languageList = languageConfig
     NetworkType = NetworkType
     closeWindow = closeWindow
-    isShowNodeList = false
 
     get routes() {
         return routes[0].children
@@ -73,6 +70,10 @@ export class MenuBarTs extends Vue {
 
     get node() {
         return this.activeAccount.node
+    }
+
+    set node(newNode: string) {
+        this.$store.commit('SET_NODE', `${newNode}`)
     }
 
     get language() {
@@ -142,8 +143,21 @@ export class MenuBarTs extends Vue {
         minWindow()
     }
 
-    removeNode(index) {
-        this.nodeList.splice(index, 1)
+    removeNode(clickedNode: string) {
+        if (this.nodeList.length === 1) {
+            Notice.trigger(Message.NODE_ALL_DELETED, NoticeType.error, this.$store)
+            return
+        }
+
+        this.nodeList.splice(
+            this.nodeList.findIndex(({value}) => value === clickedNode),
+            1,
+        )
+
+        if (clickedNode === this.node) {
+            this.node = this.nodeList[0].value
+        }
+
         localSave('nodeList', JSON.stringify(this.nodeList))
     }
 
@@ -153,7 +167,18 @@ export class MenuBarTs extends Vue {
         this.refreshValidate()
     }
 
-    switchToNewNode() {
+    submit() {
+        let {inputNodeValue} = this
+        this.$validator
+            .validate()
+            .then((valid) => {
+                if (!valid) return
+                this.inputNodeValue = completeUrlWithHostAndProtocol(inputNodeValue)
+                this.createNewNode()
+            })
+    }
+
+    createNewNode() {
         let {inputNodeValue} = this
         const nodeAlreadyExistsFlag = this.nodeList.findIndex(item => item.value == inputNodeValue)
         if (nodeAlreadyExistsFlag !== -1) {
@@ -168,24 +193,7 @@ export class MenuBarTs extends Vue {
         localSave('nodeList', JSON.stringify(this.nodeList))
     }
 
-    submitNodeInfo() {
-        let {inputNodeValue} = this
-        this.$validator
-            .validate()
-            .then((valid) => {
-                if (!valid) return
-                this.inputNodeValue = completeUrlWithHostAndProtocol(inputNodeValue)
-                this.switchToNewNode()
-            })
-    }
-
-    // initNodeList() {
-    //     const nodeListData = localRead('nodeList')
-    //     this.nodeList = nodeListData ? JSON.parse(nodeListData) : defaultNodeList
-    // }
-
     created() {
         if (isWindows) windowSizeChange()
-        // this.initNodeList()
     }
 }

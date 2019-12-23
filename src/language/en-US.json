@@ -895,5 +895,6 @@
   "Rental_fee": "Rental fee",
   "estimate": "estimate",
   "MaxFee": "Max Fee",
-  "total_transactions": "Total transactions"
+  "total_transactions": "Total transactions",
+  "all_nodes_cannot_be_deleted": "All nodes cannot be deleted"
 }
