@@ -36,7 +36,7 @@ const state: AppInfo = {
         message: '',
     },
     explorerBasePath: explorerLinkList[0].explorerBasePath,
-    nodeList: null,
+    nodeList: [],
 }
 
 const mutations: MutationTree<AppInfo> = {

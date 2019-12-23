@@ -19,6 +19,7 @@ import {
 } from "@MOCKS/index"
 import appStore from '@/store/index.ts'
 import {NetworkProperties} from '@/core/model/NetworkProperties.ts'
+
 // @ts-ignore
 const localVue = createLocalVue()
 const router = new VueRouter()
@@ -33,6 +34,7 @@ localVue.directive('focus', {
         el.focus()
     }
 })
+
 // close warning
 config.logModifiedComponents = false
 const fullUrl = 'http://1.2.3.4:3000'
@@ -42,36 +44,42 @@ describe('MenuBar', () => {
     let wrapper
     let state
     beforeEach(() => {
-            store = store = new Vuex.Store({
-                    modules: {
-                        account: {
-                            state: Object.assign(accountState.state, {
-                              //@ts-ignore
-                                wallet: new AppWallet(hdAccount.wallets[0]),
-                                currentAccount: new CurrentAccount(null, hdAccount.password, hdAccount.networkType)
-                            }),
-                            mutations: accountMutations.mutations
-                        },
-                        app: {
-                            state: Object.assign(appState.state, {
-                                NetworkProperties: NetworkProperties.create(appStore)
-                            }),
-                            mutations: appMutations.mutations
-                        }
-                    }
-                }
-            )
-            wrapper = shallowMount(MenuBar, {
-                sync: false,
-                mocks: {
-                    $t: (msg) => msg,
+        store = store = new Vuex.Store({
+            modules: {
+                account: {
+                    state: Object.assign(accountState.state, {
+                        //@ts-ignore
+                        wallet: new AppWallet(hdAccount.wallets[0]),
+                        currentAccount: new CurrentAccount(null, hdAccount.password, hdAccount.networkType),
+                        node: 'http://endpoint.com:3000',
+                    }),
+                    mutations: accountMutations.mutations
                 },
-                i18n,
-                localVue,
-                store,
-                router,
-            })
+                app: {
+                    state: Object.assign(appState.state, {
+                        NetworkProperties: NetworkProperties.create(appStore),
+                        nodeList: [{
+                            value: 'http://endpoint.com:3000',
+                            name: 'endpoint',
+                            url: 'endpoint.com',
+                        }],
+                    }),
+                    mutations: appMutations.mutations
+                }
+            }
         }
+        )
+        wrapper = shallowMount(MenuBar, {
+            sync: false,
+            mocks: {
+                $t: (msg) => msg,
+            },
+            i18n,
+            localVue,
+            store,
+            router,
+        })
+    }
     )
 
     it('menu bar should init correctly', async () => {
@@ -84,25 +92,25 @@ describe('MenuBar', () => {
     })
     it('should set url correctly while input url is http://1.2.3.4:3000', async () => {
         wrapper.vm.inputNodeValue = fullUrl
-        wrapper.vm.submitNodeInfo()
+        wrapper.vm.submit()
         await flushPromises()
         expect(wrapper.vm.node).toBe(fullUrl)
     })
     it('should set url correctly while input url is 1.2.3.4:3000', async () => {
         wrapper.vm.inputNodeValue = '1.2.3.4:3000'
-        wrapper.vm.submitNodeInfo()
+        wrapper.vm.submit()
         await flushPromises()
         expect(wrapper.vm.node).toBe(fullUrl)
     })
     it('should set url correctly while input url is http://1.2.3.4', async () => {
         wrapper.vm.inputNodeValue = 'http://1.2.3.4'
-        wrapper.vm.submitNodeInfo()
+        wrapper.vm.submit()
         await flushPromises()
         expect(wrapper.vm.node).toBe(fullUrl)
     })
     it('should set url correctly while input url is 1.2.3.4', async () => {
         wrapper.vm.inputNodeValue = '1.2.3.4'
-        wrapper.vm.submitNodeInfo()
+        wrapper.vm.submit()
         await flushPromises()
         expect(wrapper.vm.node).toBe(fullUrl)
     })
@@ -110,12 +118,48 @@ describe('MenuBar', () => {
         const mockSwitchToNewNode = jest.fn()
         wrapper.vm.switchToNewNode = mockSwitchToNewNode
         wrapper.vm.inputNodeValue = 'errorUrl'
-        wrapper.vm.submitNodeInfo()
+        wrapper.vm.submit()
         await flushPromises()
         expect(mockSwitchToNewNode).not.toHaveBeenCalled()
     })
-    it('should jump to login page after call accountQuit', () => {
-        wrapper.vm.accountQuit()
-        expect(wrapper.vm.$route.path).toBe('/login')
+
+    it('remove node should do nothing when there is only one node in the list', () => {
+        wrapper.vm.removeNode('http://endpoint.com')
+        const initialNodeList = [...wrapper.vm.nodeList]
+        expect(wrapper.vm.nodeList).toEqual(initialNodeList)
     })
+
+    it('remove node should remove a node', async (done) => {
+        wrapper.vm.inputNodeValue = 'a.new.endpoint'
+        wrapper.vm.submit()
+        await flushPromises()
+        expect(wrapper.vm.nodeList).toEqual([
+            {
+                value: 'http://a.new.endpoint:3000',
+                name: 'http://a.new.endpoint:3000',
+                url: 'http://a.new.endpoint:3000'
+            },
+            {
+                value: 'http://endpoint.com:3000',
+                name: 'endpoint',
+                url: 'endpoint.com',
+            }
+        ])
+        expect(wrapper.vm.node).toBe('http://a.new.endpoint:3000')
+
+        wrapper.vm.removeNode('http://a.new.endpoint:3000')
+        expect(wrapper.vm.nodeList).toEqual([
+            {
+                value: 'http://endpoint.com:3000',
+                name: 'endpoint',
+                url: 'endpoint.com',
+            }
+        ])
+        expect(wrapper.vm.node).toBe('http://endpoint.com:3000')
+
+        const initialNodeList = [...wrapper.vm.nodeList]
+        expect(wrapper.vm.nodeList).toEqual(initialNodeList)
+        done()
+    })
+
 })

@@ -7,7 +7,7 @@ import {windowSizeChange, minWindow, maxWindow, unMaximize, closeWindow} from '@
 import {mapState} from 'vuex'
 import {NetworkType} from "nem2-sdk"
 import {languageConfig} from "@/config/view/language"
-import {StoreAccount, AppWallet, AppInfo, Notice, NoticeType} from "@/core/model"
+import {StoreAccount, AppWallet, AppInfo, Notice, NoticeType, Endpoint} from "@/core/model"
 import routes from '@/router/routers'
 import {validation} from "@/core/validation"
 import ErrorTooltip from '@/components/other/forms/errorTooltip/ErrorTooltip.vue'
@@ -25,9 +25,10 @@ import ErrorTooltip from '@/components/other/forms/errorTooltip/ErrorTooltip.vue
 })
 export class MenuBarTs extends Vue {
     @Provide() validator: any = this.$validator
-    validation = validation
-    app: AppInfo
     activeAccount: StoreAccount
+    app: AppInfo
+    minWindow = minWindow
+    validation = validation
     isWindows = isWindows
     inputNodeValue = ''
     isNowWindowMax = false
@@ -52,10 +53,6 @@ export class MenuBarTs extends Vue {
         return this.NetworkProperties.healthy
     }
 
-    get nodeNetworkType() {
-        return this.NetworkProperties.networkType
-    }
-
     get wallet() {
         return this.activeAccount.wallet || false
     }
@@ -76,8 +73,22 @@ export class MenuBarTs extends Vue {
         this.$store.commit('SET_NODE', `${newNode}`)
     }
 
+    get nodeList() {
+        return this.app.nodeList
+    }
+
+    set nodeList(nodeList: Endpoint[]) {
+        this.$store.commit('SET_NODE_LIST', nodeList)
+        localSave('nodeList', JSON.stringify(nodeList))
+    }
+
     get language() {
         return this.$i18n.locale
+    }
+
+    set language(lang) {
+        this.$i18n.locale = lang
+        localSave('locale', lang)
     }
 
     get nodeNetworkTypeText() {
@@ -86,41 +97,22 @@ export class MenuBarTs extends Vue {
         return networkType ? NetworkType[networkType] : this.$t('Loading')
     }
 
-    set language(lang) {
-        this.$i18n.locale = lang
-        localSave('locale', lang)
-    }
-
     get currentWalletAddress() {
         if (!this.wallet) return null
         return this.activeAccount.wallet.address
     }
 
-    get accountName() {
-        return this.activeAccount.currentAccount.name
-    }
-
     set currentWalletAddress(newActiveWalletAddress) {
         AppWallet.updateActiveWalletAddress(newActiveWalletAddress, this.$store)
     }
-
-    get nodeLoading() {
-        return this.app.NetworkProperties.loading
-    }
-
-    get nodeList() {
-        return this.app.nodeList
+    
+    get accountName() {
+        return this.activeAccount.currentAccount.name
     }
 
     refreshValidate() {
         this.inputNodeValue = ''
         this.$validator.reset()
-    }
-
-    navigationIconClicked(route: any): void {
-        if (!this.walletList.length) return
-        if (this.$route.matched.map(({path}) => path).includes(route.path)) return
-        this.$router.push(route.path)
     }
 
     accountQuit() {
@@ -139,31 +131,26 @@ export class MenuBarTs extends Vue {
         unMaximize()
     }
 
-    minWindow() {
-        minWindow()
-    }
-
     removeNode(clickedNode: string) {
         if (this.nodeList.length === 1) {
             Notice.trigger(Message.NODE_ALL_DELETED, NoticeType.error, this.$store)
             return
         }
 
-        this.nodeList.splice(
-            this.nodeList.findIndex(({value}) => value === clickedNode),
+        const nodeList = [...this.nodeList]
+
+        nodeList.splice(
+            nodeList.findIndex(({value}) => value === clickedNode),
             1,
         )
 
-        if (clickedNode === this.node) {
-            this.node = this.nodeList[0].value
-        }
-
-        localSave('nodeList', JSON.stringify(this.nodeList))
+        if (clickedNode === this.node) this.node = nodeList[0].value
+        this.nodeList = nodeList
     }
 
     selectEndpoint(index) {
         if (this.node === this.nodeList[index].value) return
-        this.$store.commit('SET_NODE', this.nodeList[index].value)
+        this.node = this.nodeList[index].value
         this.refreshValidate()
     }
 
@@ -179,18 +166,24 @@ export class MenuBarTs extends Vue {
     }
 
     createNewNode() {
-        let {inputNodeValue} = this
-        const nodeAlreadyExistsFlag = this.nodeList.findIndex(item => item.value == inputNodeValue)
-        if (nodeAlreadyExistsFlag !== -1) {
-            this.nodeList.splice(nodeAlreadyExistsFlag, 1)
-        }
-        this.nodeList.unshift({
+        const {inputNodeValue} = this
+        console.log("TCL: MenuBarTs -> createNewNode -> inputNodeValue", inputNodeValue)
+        const nodeList = [...this.nodeList]
+        console.log("TCL: MenuBarTs -> createNewNode -> nodeList", nodeList)
+        const nodeIndexInList = nodeList.findIndex(item => item.value == inputNodeValue)
+        
+        if (nodeIndexInList > -1) nodeList.splice(nodeIndexInList, 1)
+        
+        nodeList.unshift({
             value: inputNodeValue,
             name: inputNodeValue,
             url: inputNodeValue
         })
+
+        this.nodeList = nodeList
+        console.log("TCL: MenuBarTs -> createNewNode -> this.nodeList", this.nodeList)
+        console.log("TCL: MenuBarTs -> createNewNode -> nodeList", nodeList)
         this.selectEndpoint(0)
-        localSave('nodeList', JSON.stringify(this.nodeList))
     }
 
     created() {

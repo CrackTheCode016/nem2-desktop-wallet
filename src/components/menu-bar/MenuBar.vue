@@ -1,8 +1,8 @@
 <template>
   <div :class="[isWindows?'windows':'mac','wrap']">
-    <div v-if="isNodeHealthy && nodeNetworkType && networkType">
+    <div v-if="isNodeHealthy && NetworkProperties.networkType && networkType">
       <Alert class="alert warning_alert"
-             v-if="nodeNetworkType !== NetworkType[networkType] "
+             v-if="NetworkProperties.networkType !== NetworkType[networkType] "
              type="error">
         <Icon type="ios-warning-outline"/>
         {{$t('Wallet_network_type_does_not_match_current_network_type')}}
@@ -55,7 +55,7 @@
 
         <div class="app_controller clear">
           <div :class="[isNodeHealthy?'point_healthy':'point_unhealthy']">
-            <Spin class="absolute un_click" v-if="nodeLoading"></Spin>
+            <Spin class="absolute un_click" v-if="NetworkProperties.loading"></Spin>
             <Poptip @on-popper-hide="refreshValidate" placement="bottom-end">
               <i class="pointer point"/>
               <span class="network_type_text" v-if="wallet">
