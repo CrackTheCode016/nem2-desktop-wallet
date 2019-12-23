@@ -7,11 +7,12 @@ import {mapState} from "vuex"
 import {AppInfo, MosaicNamespaceStatusType, StoreAccount} from "@/core/model"
 import routes from '@/router/routers'
 import numberGrow from '@/components/number-grow/NumberGrow.vue'
-import {networkConfig} from "@/config/index"
-const {targetBlockTime} = networkConfig
+import NumberFormatting from '@/components/number-formatting/NumberFormatting.vue'
+
 @Component({
     components: {
         numberGrow,
+        NumberFormatting
     },
     computed: {
         ...mapState({
@@ -32,7 +33,7 @@ export class MonitorTs extends Vue {
     monitorSelected = monitorSelected
     monitorUnselected = monitorUnselected
     formatNumber = formatNumber
-    defaultTargetBlockTime = targetBlockTime
+
     get balance(): number {
         const {wallet} = this.activeAccount
         if (!wallet) return 0
