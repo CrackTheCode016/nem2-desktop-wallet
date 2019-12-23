@@ -21,7 +21,6 @@ export class TransactionInfoTemplateTs extends Vue {
     renderMosaicsAndReturnArray = renderMosaicsAndReturnArray
     TransferTransaction = TransferTransaction
     NamespaceId = NamespaceId
-    formatNumber = formatNumber
 
     @Prop()
     transactionDetails

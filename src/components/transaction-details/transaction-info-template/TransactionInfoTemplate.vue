@@ -34,7 +34,7 @@
             </div>
             <div>
               <span class="title">{{$t('amount')}}</span>
-              <NumberFormatting :numberOfFormatting="formatNumber(a.amount)"></NumberFormatting>
+              <NumberFormatting :numberOfFormatting="a.amount"></NumberFormatting>
             </div>
           </div>
           <div v-if="t.message">
