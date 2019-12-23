@@ -7,7 +7,7 @@ import {windowSizeChange, minWindow, maxWindow, unMaximize, closeWindow} from '@
 import {mapState} from 'vuex'
 import {NetworkType} from "nem2-sdk"
 import {languageConfig} from "@/config/view/language"
-import {nodeListConfig} from "@/config/view/node"
+import {defaultNodeList} from "@/config/view/node"
 import {StoreAccount, AppWallet, AppInfo, Endpoint} from "@/core/model"
 import routes from '@/router/routers'
 import {validation} from "@/core/validation"
@@ -28,7 +28,6 @@ export class MenuBarTs extends Vue {
     @Provide() validator: any = this.$validator
     validation = validation
     app: AppInfo
-    nodeList: Endpoint[] = [] // @TODO: review node list
     activeAccount: StoreAccount
     showNodeList: boolean = false
     isWindows = isWindows
@@ -108,6 +107,10 @@ export class MenuBarTs extends Vue {
         return this.app.NetworkProperties.loading
     }
 
+    get nodeList() {
+        return this.app.nodeList
+    }
+
     refreshValidate() {
         this.inputNodeValue = ''
         this.$validator.reset()
@@ -145,10 +148,9 @@ export class MenuBarTs extends Vue {
     }
 
     selectEndpoint(index) {
-        if (this.node == this.nodeList[index].value) return
+        if (this.node === this.nodeList[index].value) return
         this.$store.commit('SET_NODE', this.nodeList[index].value)
         this.refreshValidate()
-
     }
 
     switchToNewNode() {
@@ -177,13 +179,13 @@ export class MenuBarTs extends Vue {
             })
     }
 
-    initNodeList() {
-        const nodeListData = localRead('nodeList')
-        this.nodeList = nodeListData ? JSON.parse(nodeListData) : nodeListConfig
-    }
+    // initNodeList() {
+    //     const nodeListData = localRead('nodeList')
+    //     this.nodeList = nodeListData ? JSON.parse(nodeListData) : defaultNodeList
+    // }
 
     created() {
         if (isWindows) windowSizeChange()
-        this.initNodeList()
+        // this.initNodeList()
     }
 }

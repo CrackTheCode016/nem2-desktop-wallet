@@ -1,7 +1,7 @@
 import {Endpoint} from '@/core/model'
 import {NetworkType} from "nem2-sdk"
 
-export const nodeListConfig: Endpoint[] = [
+export const defaultNodeList: Endpoint[] = [
     {
         value: 'http://api-harvest-20.ap-northeast-1.nemtech.network:3000',
         name: 'ap-northeast-1',

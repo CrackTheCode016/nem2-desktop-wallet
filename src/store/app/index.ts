@@ -36,6 +36,7 @@ const state: AppInfo = {
         message: '',
     },
     explorerBasePath: explorerLinkList[0].explorerBasePath,
+    nodeList: null,
 }
 
 const mutations: MutationTree<AppInfo> = {
@@ -100,6 +101,9 @@ const mutations: MutationTree<AppInfo> = {
     SET_EXPLORER_BASE_PATH(state: AppInfo, explorerBasePath: string) {
         state.explorerBasePath = explorerBasePath
     },
+    SET_NODE_LIST(state: AppInfo, nodeList) {
+        state.nodeList = nodeList
+    }
 }
 
 const actions = {

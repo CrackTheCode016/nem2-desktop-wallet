@@ -90,7 +90,8 @@ export interface AppInfo {
     stagedTransaction: StagedTransaction,
     logs: Log[],
     loadingOverlay: LoadingOverlayObject,
-    explorerBasePath:string
+    explorerBasePath:string,
+    nodeList: Endpoint[],
 }
 
 export interface StagedTransaction {
