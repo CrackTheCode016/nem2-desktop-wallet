@@ -1,6 +1,6 @@
 
 import {AppWallet} from '@/core/model/AppWallet.ts'
-import {from, throwError} from 'rxjs'
+import {from, throwError, of} from 'rxjs'
 import {tap, map, catchError, mapTo} from 'rxjs/operators'
 import * as sdk from 'nem2-sdk'
 import {config, createLocalVue} from '@vue/test-utils'
@@ -33,6 +33,47 @@ import {Message} from '@/config'
 import {Log, Notice, NoticeType, NetworkProperties} from '@/core/model'
 jest.mock('@/core/model/Log')
 jest.mock('@/core/model/Notice')
+
+const mockGetAccountInfoCall = jest.fn()
+
+const mockErroredGetAccountInfo = () => of('mock').pipe(
+    tap((args) => mockGetAccountInfoCall(args)),
+    map(() => {throw new Error('Couldn\'t get account info')}),
+    catchError(error => throwError(error)),
+)
+
+// const mockUnknownGetAccountInfo = (args) => of(args).pipe(
+//     tap((args) => mockGetAccountInfoCall(args)),
+//     mapTo({publicKey: EMPTY_PUBLIC_KEY}),
+// )
+
+const mockGetAccountInfo = (args) => of(args).pipe(
+    tap((args) => mockGetAccountInfoCall(args)),
+    mapTo({
+        publicKey: 'this is a public key',
+        importance: UInt64.fromUint(1)
+    }),
+)
+
+
+jest.mock('nem2-sdk/dist/src/infrastructure/AccountHttp', () => ({
+    AccountHttp: jest.fn().mockImplementation((endpoint) => {
+        if (endpoint === 'http://errored.endpoint:3000') {
+            return {
+                getAccountInfo: mockErroredGetAccountInfo,
+            }
+        }
+        // if (endpoint === 'http://unknown.address.endpoint:3000') {
+        //     return {
+        //         getAccountInfo: mockUnknownGetAccountInfo,
+        //     }
+        // }
+        return {
+            getAccountInfo: mockGetAccountInfo,
+        }
+    })
+}))
+
 
 // close warning
 // @ts-ignore
@@ -183,44 +224,28 @@ describe('AppWallet', () => {
         expect(appWallet.publicAccount).toEqual(PublicAccount.createFromPublicKey(appWallet.publicKey, appWallet.networkType))
     })
 
-    it('refreshImportance should not change other data except importance', () => {
+
+    it('refreshImportance should not change other data except importance', async (done) => {
         // @ts-ignore
         const appWallet = new AppWallet(hdAccount.wallets[0]);
-        const refreshImportanceMock = jest.fn();
-        appWallet.refreshImportance = refreshImportanceMock
+        const walletCopy = {...appWallet}
 
-        // copy value from appWallet
-        const coptWallet = {
-            name: appWallet.name,
-            simpleWallet: appWallet.simpleWallet,
-            address: appWallet.address,
-            publicKey: appWallet.publicKey,
-            networkType: appWallet.networkType,
-            active: appWallet.active,
-            balance: appWallet.balance,
-            encryptedMnemonic: appWallet.encryptedMnemonic,
-            path: appWallet.path,
-            sourceType: appWallet.sourceType,
-            importance: appWallet.importance,
-            linkedAccountKey: appWallet.linkedAccountKey,
-            remoteAccount: appWallet.remoteAccount,
-        }
-        
-        appWallet.refreshImportance(store);
+        await appWallet.refreshImportance(store);
+        await  flushPromises()
+        done()
 
-        expect(refreshImportanceMock).toHaveBeenCalled();
-        expect(coptWallet.name).toStrictEqual(appWallet.name);
-        expect(coptWallet.simpleWallet).toStrictEqual(appWallet.simpleWallet);
-        expect(coptWallet.address).toStrictEqual(appWallet.address);
-        expect(coptWallet.publicKey).toStrictEqual(appWallet.publicKey);
-        expect(coptWallet.networkType).toStrictEqual(appWallet.networkType);
-        expect(coptWallet.active).toStrictEqual(appWallet.active);
-        expect(coptWallet.balance).toStrictEqual(appWallet.balance);
-        expect(coptWallet.encryptedMnemonic).toStrictEqual(appWallet.encryptedMnemonic);
-        expect(coptWallet.path).toStrictEqual(appWallet.path);
-        expect(coptWallet.sourceType).toStrictEqual(appWallet.sourceType);
-        expect(coptWallet.remoteAccount).toStrictEqual(appWallet.remoteAccount);
-        expect(coptWallet.linkedAccountKey).toStrictEqual(appWallet.linkedAccountKey)
+        expect(walletCopy.name).toStrictEqual(appWallet.name);
+        expect(walletCopy.simpleWallet).toStrictEqual(appWallet.simpleWallet);
+        expect(walletCopy.address).toStrictEqual(appWallet.address);
+        expect(walletCopy.publicKey).toStrictEqual(appWallet.publicKey);
+        expect(walletCopy.networkType).toStrictEqual(appWallet.networkType);
+        expect(walletCopy.active).toStrictEqual(appWallet.active);
+        expect(walletCopy.balance).toStrictEqual(appWallet.balance);
+        expect(walletCopy.encryptedMnemonic).toStrictEqual(appWallet.encryptedMnemonic);
+        expect(walletCopy.path).toStrictEqual(appWallet.path);
+        expect(walletCopy.sourceType).toStrictEqual(appWallet.sourceType);
+        expect(walletCopy.remoteAccount).toStrictEqual(appWallet.remoteAccount);
+        expect(walletCopy.linkedAccountKey).toStrictEqual(appWallet.linkedAccountKey)
     })
 })
 

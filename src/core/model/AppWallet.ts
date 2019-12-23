@@ -532,11 +532,13 @@ export class AppWallet {
 
     async refreshImportance(store: Store<AppState>): Promise<void> {
         try {
+            console.log(AccountHttp)
             const accountInfo = await new AccountHttp(store.state.account.node)
                 .getAccountInfo(Address.createFromRawAddress(store.state.account.wallet.address))
                 .toPromise()
+            console.log(accountInfo)
             this.importance = accountInfo.importance.compact();
-
+            console.log(this.importance)
             this.updateWallet(store);
         } catch (error) {            
             console.error("AppWallet -> refreshImportance -> error", error);
