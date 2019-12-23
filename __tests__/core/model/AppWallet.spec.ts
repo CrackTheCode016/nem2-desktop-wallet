@@ -185,7 +185,9 @@ describe('AppWallet', () => {
 
     it('refreshImportance should not change other data except importance', () => {
         // @ts-ignore
-        const appWallet = new AppWallet(hdAccount.wallets[0])
+        const appWallet = new AppWallet(hdAccount.wallets[0]);
+        const refreshImportanceMock = jest.fn();
+        appWallet.refreshImportance = refreshImportanceMock
 
         // copy value from appWallet
         const coptWallet = {
@@ -202,8 +204,11 @@ describe('AppWallet', () => {
             importance: appWallet.importance,
             linkedAccountKey: appWallet.linkedAccountKey,
             remoteAccount: appWallet.remoteAccount,
-        }        
+        }
+        
+        appWallet.refreshImportance(store);
 
+        expect(refreshImportanceMock).toHaveBeenCalled();
         expect(coptWallet.name).toStrictEqual(appWallet.name);
         expect(coptWallet.simpleWallet).toStrictEqual(appWallet.simpleWallet);
         expect(coptWallet.address).toStrictEqual(appWallet.address);
@@ -215,7 +220,7 @@ describe('AppWallet', () => {
         expect(coptWallet.path).toStrictEqual(appWallet.path);
         expect(coptWallet.sourceType).toStrictEqual(appWallet.sourceType);
         expect(coptWallet.remoteAccount).toStrictEqual(appWallet.remoteAccount);
-        expect(coptWallet.linkedAccountKey).toStrictEqual(appWallet.linkedAccountKey);
+        expect(coptWallet.linkedAccountKey).toStrictEqual(appWallet.linkedAccountKey)
     })
 })
 

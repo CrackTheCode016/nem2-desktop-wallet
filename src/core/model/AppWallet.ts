@@ -538,7 +538,7 @@ export class AppWallet {
             this.importance = accountInfo.importance.compact();
 
             this.updateWallet(store);
-        } catch (error) {
+        } catch (error) {            
             console.error("AppWallet -> refreshImportance -> error", error);
         }
     }
