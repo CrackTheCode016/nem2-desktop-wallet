@@ -26,16 +26,13 @@ const getBalanceFromAccountInfo = (accountInfo: AccountInfo,
 export const setWalletsBalances = async (store: Store<AppState>): Promise<void> => {
     try {
         const {wallet, currentAccount, node, networkCurrency} = store.state.account
-        console.log("TCL: wallet, currentAccount, node, networkCurrency", wallet, currentAccount, node, networkCurrency)
         const {walletList} = store.state.app
-        console.log("TCL: walletList", walletList)
         if (!walletList.length) return
 
         Log.create('setWalletsBalances', walletList.map(({address, name}) => ({address, name})), store)
 
         const addresses = walletList.map(({address}) => Address.createFromRawAddress(address))
         const accountsInfo: AccountInfo[] = await new AccountHttp(node).getAccountsInfo(addresses).toPromise()
-        console.log("TCL: accountsInfo", accountsInfo)
         // set mosaic types and wallets balance
         const balances = accountsInfo.map(ai => {
             return {
@@ -58,7 +55,6 @@ export const setWalletsBalances = async (store: Store<AppState>): Promise<void> 
 
 
         const activeWalletWithBalance = appWalletsWithBalance.find(w => w.address === wallet.address)
-        console.log("TCL: activeWalletWithBalance", activeWalletWithBalance)
 
         if (activeWalletWithBalance === undefined) {
             throw new Error('an active wallet was not found in the wallet list')
