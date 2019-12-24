@@ -71,13 +71,6 @@ describe('WalletSwitch', () => {
   it('Component TheWalletDelete should mount correctly ', () => {
     expect(wrapper).not.toBeNull()
   })
-  it('Component TheWalletDelete delete target wallet rightly ', async () => {
-    wrapper.vm.password = hdAccountData.password
-    wrapper.vm.submit()
-    await flushPromises()
-    expect(wrapper.vm.$store.state.app.walletList.length).toBe(hdAccount.wallets.length-1)
-    expect(wrapper.vm.$store.state.app.walletList.find(item=>item.address == hdAccount.wallets[0].address)).toBeUndefined()
-  })
 
 
 })
