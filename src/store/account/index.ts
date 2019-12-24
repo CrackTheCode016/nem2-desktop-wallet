@@ -106,7 +106,6 @@ const mutations: MutationTree<StoreAccount> = {
         state.namespaces = [...state.namespaces, ...namespaces]
     },
     SET_NODE(state: StoreAccount, node: string): void {
-        console.log("TCL: state, SET_NODE", node)
         state.node = node
         localSave('activeNode', node)
     },

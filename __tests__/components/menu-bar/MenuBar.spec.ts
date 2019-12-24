@@ -161,5 +161,4 @@ describe('MenuBar', () => {
         expect(wrapper.vm.nodeList).toEqual(initialNodeList)
         done()
     })
-
 })

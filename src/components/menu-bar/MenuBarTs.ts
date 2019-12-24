@@ -79,7 +79,6 @@ export class MenuBarTs extends Vue {
 
     set nodeList(nodeList: Endpoint[]) {
         this.$store.commit('SET_NODE_LIST', nodeList)
-        localSave('nodeList', JSON.stringify(nodeList))
     }
 
     get language() {
@@ -118,7 +117,7 @@ export class MenuBarTs extends Vue {
     accountQuit() {
         this.$store.commit('RESET_APP')
         this.$store.commit('RESET_ACCOUNT')
-        this.$router.push("login")
+        this.$router.push('login')
     }
 
     maxWindow() {
@@ -167,9 +166,7 @@ export class MenuBarTs extends Vue {
 
     createNewNode() {
         const {inputNodeValue} = this
-        console.log("TCL: MenuBarTs -> createNewNode -> inputNodeValue", inputNodeValue)
         const nodeList = [...this.nodeList]
-        console.log("TCL: MenuBarTs -> createNewNode -> nodeList", nodeList)
         const nodeIndexInList = nodeList.findIndex(item => item.value == inputNodeValue)
         
         if (nodeIndexInList > -1) nodeList.splice(nodeIndexInList, 1)
@@ -181,8 +178,6 @@ export class MenuBarTs extends Vue {
         })
 
         this.nodeList = nodeList
-        console.log("TCL: MenuBarTs -> createNewNode -> this.nodeList", this.nodeList)
-        console.log("TCL: MenuBarTs -> createNewNode -> nodeList", nodeList)
         this.selectEndpoint(0)
     }
 

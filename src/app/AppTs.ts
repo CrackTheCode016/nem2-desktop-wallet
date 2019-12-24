@@ -4,13 +4,11 @@ import {mapState} from 'vuex'
 import {asyncScheduler} from 'rxjs'
 import {throttleTime} from 'rxjs/operators'
 import {isWindows, APP_PARAMS} from '@/config'
-
-
-// import {checkInstall} from '@/core/utils'
 import {
   setMarketOpeningPrice, OnWalletChange,
   OnActiveMultisigAccountChange, Endpoints,
 } from '@/core/services'
+
 import {
   AppInfo, StoreAccount, Notice,
   NetworkManager, Listeners, NetworkProperties,

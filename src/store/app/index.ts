@@ -6,7 +6,7 @@ import {
     LoadingOverlayObject,
     NetworkProperties,
 } from '@/core/model'
-import {localRead} from "@/core/utils";
+import {localRead, localSave} from "@/core/utils";
 import {MutationTree} from 'vuex';
 import {explorerLinkList} from "@/config"
 import Vue from 'vue'
@@ -103,6 +103,7 @@ const mutations: MutationTree<AppInfo> = {
     },
     SET_NODE_LIST(state: AppInfo, nodeList) {
         state.nodeList = nodeList
+        localSave('nodeList', JSON.stringify(nodeList))
     }
 }
 

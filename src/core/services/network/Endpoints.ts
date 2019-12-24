@@ -1,4 +1,4 @@
-import {localRead, localSave} from '@/core/utils'
+import {localRead} from '@/core/utils/utils'
 import {Store} from 'vuex'
 import {AppState, Endpoint} from '@/core/model'
 import {defaultNodeList} from "@/config/view/node"
@@ -32,7 +32,6 @@ export class Endpoints {
         this.setDefaultNodeListInLocalStorage()
         return defaultNodeList
       }
-
       this.store.commit('SET_NODE_LIST', parsedNodeList)
       return parsedNodeList
     } catch (error) {
@@ -48,14 +47,12 @@ export class Endpoints {
   }
 
   setDefaultNodeListInLocalStorage(): void {
-    localSave('nodeList', JSON.stringify(defaultNodeList))
     this.store.commit('SET_NODE_LIST', defaultNodeList)
   }
 
   init(): Promise<void> {
     return new Promise((resolve) => {
       this.store.commit('SET_NODE', this.activeNode)
-      console.log(this)
       resolve()
     })
   }
