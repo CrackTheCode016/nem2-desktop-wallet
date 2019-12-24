@@ -1,4 +1,4 @@
-import {isWindows, Message} from "@/config/index.ts"
+import {isWindows, Message, defaultNodeList} from "@/config/index.ts"
 import monitorSelected from '@/common/img/window/windowSelected.png'
 import monitorUnselected from '@/common/img/window/windowUnselected.png'
 import {completeUrlWithHostAndProtocol, localSave} from "@/core/utils"
@@ -178,6 +178,11 @@ export class MenuBarTs extends Vue {
         })
 
         this.nodeList = nodeList
+        this.selectEndpoint(0)
+    }
+
+    resetNodeListToDefault() {
+        this.nodeList = defaultNodeList
         this.selectEndpoint(0)
     }
 

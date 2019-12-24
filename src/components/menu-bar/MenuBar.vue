@@ -61,7 +61,7 @@
               <span class="network_type_text" v-if="wallet">
                 {{ nodeNetworkTypeText }}
               </span>
-              <div slot="title" class="title">{{$t('current_point')}}：{{node}}</div>
+              <div slot="title" class="title">{{$t('current_endpoint')}}：{{node}}</div>
               <div slot="content">
                 <div class="node_list">
                   <div class="node_list_container scroll">
@@ -76,6 +76,7 @@
                       <img class="remove_icon" @click.stop="removeNode(node)"
                            src="@/common/img/service/multisig/multisigDelete.png">
                     </div>
+                    <span @click="resetNodeListToDefault">RESET NODE LIST TO DEFAULT</span>
                   </div>
 
                   <form
