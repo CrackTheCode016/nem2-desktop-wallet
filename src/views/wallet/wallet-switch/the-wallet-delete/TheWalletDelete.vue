@@ -18,21 +18,10 @@
           <p class="checkRemind">{{$t('delete_wallet_tip', {walletName :walletToDelete.name})}}</p>
           <p v-if="walletList.length == 1" class="checkRemind orange">
             {{$t('this_account_will_be_logged_out_after_the_wallet_is_successfully_deleted')}}</p>
-          <form action="submit" class="password-container" onsubmit="event.preventDefault()" @keyup.enter="submit">
-            <ErrorTooltip fieldName="password">
-              <input
-                v-focus
-                v-model.lazy="password"
-                type="password"
-                v-validate="validation.accountPassword"
-                data-vv-name="password"
-                :data-vv-as="$t('password')"
-                :placeholder="$t('please_enter_your_wallet_password')"
-              />
-            </ErrorTooltip>
-            <input v-show="false" v-model="accountPassword" v-validate disabled data-vv-name="accountPassword"/>
-            <Button type="success" @click="submit"> {{$t('confirm')}}</Button>
-          </form>
+          <CheckPassword
+            :returnPassword="true"
+            @passwordValidated="passwordValidated"
+          ></CheckPassword>
         </div>
       </div>
     </Modal>
