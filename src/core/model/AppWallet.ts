@@ -195,10 +195,8 @@ export class AppWallet {
     }
 
     getAccount(password: Password): Account {
-        const {encryptedKey, iv} = this.simpleWallet.encryptedPrivateKey
-        const {network} = this.simpleWallet
-        const privateKey = new EncryptedPrivateKey(encryptedKey, iv).decrypt(password)
-        return Account.createFromPrivateKey(privateKey, network)
+        //@ts-ignore
+        return SimpleWallet.createFromDTO(this.simpleWallet).open(password)
     }
 
     getRemoteAccountPrivateKey(password: string): string {
@@ -394,9 +392,9 @@ export class AppWallet {
 
     /**
      * Routes a signedTransaction to the relevant announce method
-     * @param signedTransaction 
-     * @param store 
-     * @param signedLock 
+     * @param signedTransaction
+     * @param store
+     * @param signedLock
      */
     announceTransaction(
         signedTransaction: SignedTransaction | CosignatureSignedTransaction,
