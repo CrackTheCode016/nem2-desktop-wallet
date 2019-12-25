@@ -1,5 +1,5 @@
 <template>
-  <div class="delete_wallet_container" @keyup.enter="submit">
+  <div class="delete_wallet_container">
     <Modal
       v-model="visible"
       class-name="vertical-center-modal"
