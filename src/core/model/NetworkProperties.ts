@@ -4,7 +4,7 @@ import {networkConfig, defaultNodeList, NETWORK_CONSTANTS} from '@/config'
 import {formatTimestamp} from '@/core/utils'
 import {AppState} from '.'
 
-const {maxRollbackBlocks, defaultDynamicFeeMultiplier} = networkConfig
+const {maxDifficultyBlocks, defaultDynamicFeeMultiplier} = networkConfig
 
 export class NetworkProperties {
   fee: number
@@ -52,13 +52,13 @@ export class NetworkProperties {
   setLoadingToTrue(endpoint: string) {
     this.loading = true
     this.store.dispatch('SET_NETWORK_PROPERTIES', {endpoint, NetworkProperties: this})
-  }  
+  }
 
   setHealthyToFalse(endpoint: string) {
     this.healthy = false
     this.loading = false
     this.store.dispatch('SET_NETWORK_PROPERTIES', {endpoint, NetworkProperties: this})
-  }  
+  }
 
   setValuesFromFirstBlock(block: BlockInfo, endpoint: string) {
     this.generationHash = block.generationHash
@@ -87,7 +87,7 @@ export class NetworkProperties {
 
   handleLastBlock(block: BlockInfo, endpoint: string) {
     this.setLastBlock(block, endpoint)
-    if (this.lastBlocks.length > maxRollbackBlocks) this.lastBlocks.length = maxRollbackBlocks - 1
+    if (this.lastBlocks.length >= maxDifficultyBlocks) this.lastBlocks.length = maxDifficultyBlocks - 1
     this.lastBlocks.unshift(block)
     this.setNetworkFee(endpoint)
   }

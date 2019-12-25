@@ -29,6 +29,7 @@ import {AppAccounts, CreateWalletType} from "@/core/model"
 import {AppState, RemoteAccount} from './types'
 import {Log} from './Log'
 import {Notice, NoticeType} from './Notice'
+import {ISimpleWalletDTO} from "nem2-sdk/dist/src/infrastructure/wallet/simpleWalletDTO"
 
 const {DEFAULT_LOCK_AMOUNT} = defaultNetworkConfig
 const {EMPTY_PUBLIC_KEY} = networkConfig
@@ -55,6 +56,14 @@ export class AppWallet {
     linkedAccountKey: string
     remoteAccount: RemoteAccount | null
     numberOfMosaics: number
+
+    get publicAccount(): PublicAccount {
+      return PublicAccount.createFromPublicKey(this.publicKey, this.networkType)
+    }
+
+    static createFromDTO(wallet) {
+      return Object.assign(new AppWallet(wallet),{simpleWallet:SimpleWallet.createFromDTO(wallet.simpleWallet)})
+    }
 
     createFromPrivateKey(name: string,
                          password: Password,
@@ -524,7 +533,4 @@ export class AppWallet {
         }
     }
 
-    get publicAccount(): PublicAccount {
-        return PublicAccount.createFromPublicKey(this.publicKey, this.networkType)
-    }
 }
