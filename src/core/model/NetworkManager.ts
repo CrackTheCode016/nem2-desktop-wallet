@@ -77,7 +77,7 @@ export class NetworkManager {
    const currentEndpoint = `${this.endpoint}`
    const heightUint = await this.chainHttp.getBlockchainHeight().toPromise()
    const height = heightUint.compact()
-   const blocksInfo = await this.blockHttp.getBlocksByHeightWithLimit(`${height}`).toPromise()
+   const blocksInfo = await this.blockHttp.getBlocksByHeightWithLimit(`${height}`,1).toPromise()
    this.NetworkProperties.initializeLatestBlocks(blocksInfo, currentEndpoint)
  }
 
