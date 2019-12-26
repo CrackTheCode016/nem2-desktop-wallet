@@ -19,12 +19,13 @@ export class TheWalletDeleteTs extends Vue {
     @Prop()
     walletToDelete: AppWallet
 
-  get visible(){
-      return this.showCheckPWDialog
-  }
-  set visible(value){
-    this.$emit('closeCheckPWDialog')
-  }
+    get visible(){
+        return this.showCheckPWDialog
+    }
+
+    set visible(value){
+        this.$emit('closeCheckPWDialog')
+    }
 
     get getWallet() {
         return this.activeAccount.wallet
@@ -58,9 +59,9 @@ export class TheWalletDeleteTs extends Vue {
             return
         }
         try {
-            const isPasswordCorrect = new AppWallet(this.walletToDelete).checkPassword(this.password)
+            const isPasswordCorrect = AppWallet.createFromDTO(this.walletToDelete).checkPassword(this.password)
             if (isPasswordCorrect) {
-                new AppWallet(this.walletToDelete).delete(this.$store, this)
+                AppWallet.createFromDTO(this.walletToDelete).delete(this.$store, this)
                 this.visible = false
                 return
             }
@@ -79,7 +80,7 @@ export class TheWalletDeleteTs extends Vue {
         try {
             const isWalletNameCorrect = this.password === this.getWallet.name
             if (isWalletNameCorrect) {
-                new AppWallet(this.walletToDelete).delete(this.$store, this)
+                AppWallet.createFromDTO(this.walletToDelete).delete(this.$store, this)
               this.visible = false
               return
             }

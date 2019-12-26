@@ -1,6 +1,6 @@
 import {Vue, Component} from 'vue-property-decorator'
 import {AppInfo, AppWallet, CurrentAccount, StoreAccount} from "@/core/model"
-import {localRead, localSave} from "@/core/utils"
+import {localSave} from "@/core/utils"
 import {Password} from "nem2-sdk"
 import {mapState} from "vuex"
 
@@ -46,7 +46,6 @@ export default class FinishCreateTs extends Vue {
             this.$store.commit('REMOVE_TEMPORARY_INFO')
             this.$router.push('/dashboard')
         } catch (error) {
-            console.log(error)
             throw new Error(error)
         }
     }

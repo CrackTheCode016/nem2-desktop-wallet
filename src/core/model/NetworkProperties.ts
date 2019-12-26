@@ -56,7 +56,7 @@ export class NetworkProperties {
 
   setHealthyToFalse(endpoint: string) {
     this.healthy = false
-    this.loading = false
+    this.loading = false 
     this.store.dispatch('SET_NETWORK_PROPERTIES', {endpoint, NetworkProperties: this})
   }
 

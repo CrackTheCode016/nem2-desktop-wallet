@@ -29,16 +29,13 @@ import {AppAccounts, CreateWalletType} from "@/core/model"
 import {AppState, RemoteAccount} from './types'
 import {Log} from './Log'
 import {Notice, NoticeType} from './Notice'
-import {ISimpleWalletDTO} from "nem2-sdk/dist/src/infrastructure/wallet/simpleWalletDTO"
 
 const {DEFAULT_LOCK_AMOUNT} = defaultNetworkConfig
 const {EMPTY_PUBLIC_KEY} = networkConfig
 
+// @TODO: refactor and review instantiation methods...
 export class AppWallet {
-    constructor(wallet?: {
-        name?: string,
-        simpleWallet?: SimpleWallet,
-    }) {
+    constructor(wallet?) {
         Object.assign(this, wallet)
     }
 
@@ -61,8 +58,11 @@ export class AppWallet {
       return PublicAccount.createFromPublicKey(this.publicKey, this.networkType)
     }
 
-    static createFromDTO(wallet) {
-      return Object.assign(new AppWallet(wallet),{simpleWallet:SimpleWallet.createFromDTO(wallet.simpleWallet)})
+    static createFromDTO(walletDTO): AppWallet {
+        return new AppWallet({
+            ...walletDTO,
+            simpleWallet: SimpleWallet.createFromDTO(walletDTO.simpleWallet),
+        })
     }
 
     createFromPrivateKey(name: string,
@@ -111,7 +111,6 @@ export class AppWallet {
             this.addNewWalletToList(store)
             return this
         } catch (error) {
-            console.log(error)
             throw new Error(error)
         }
     }
@@ -204,8 +203,7 @@ export class AppWallet {
     }
 
     getAccount(password: Password): Account {
-        //@ts-ignore
-        return SimpleWallet.createFromDTO(this.simpleWallet).open(password)
+        return this.simpleWallet.open(password)
     }
 
     getRemoteAccountPrivateKey(password: string): string {

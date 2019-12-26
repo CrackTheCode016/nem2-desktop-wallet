@@ -5,9 +5,11 @@ import {
 import {Store} from 'vuex'
 import {AppState, Notice, AppMosaic, NetworkProperties} from '.'
 import {NoticeType} from './Notice'
-import {Message} from '@/config'
+import {Message, networkConfig} from '@/config'
 import {OnWalletChange, setWalletsBalances} from '../services'
 import {Listeners} from './Listeners'
+
+const {maxDifficultyBlocks} = networkConfig
 
 export class NetworkManager {
  blockHttp: BlockHttp
@@ -28,7 +30,6 @@ export class NetworkManager {
  }
 
  public async switchEndpoint(endpoint: string): Promise<void> {
- console.log("TCL: NetworkManager -> switchEndpoint")
    try {
      this.NetworkProperties.setLoadingToTrue(endpoint)
      const initialGenerationHash = `${this.generationHash}`
@@ -43,7 +44,6 @@ export class NetworkManager {
      Notice.trigger(Message.NODE_CONNECTION_SUCCEEDED, NoticeType.success, this.store)
      if (initialGenerationHash !== this.generationHash) await this.switchGenerationHash()
    } catch (error) {
-     console.log('TCL: NetworkManager -> error', error)
      this.NetworkProperties.setHealthyToFalse(endpoint)
    }
  }
@@ -78,7 +78,9 @@ export class NetworkManager {
    const currentEndpoint = `${this.endpoint}`
    const heightUint = await this.chainHttp.getBlockchainHeight().toPromise()
    const height = heightUint.compact()
-   const blocksInfo = await this.blockHttp.getBlocksByHeightWithLimit(`${height}`,1).toPromise()
+   const blocksInfo = await this.blockHttp.getBlocksByHeightWithLimit(
+     `${height}`, maxDifficultyBlocks,
+    ).toPromise()
    this.NetworkProperties.initializeLatestBlocks(blocksInfo, currentEndpoint)
  }
 
