@@ -15,7 +15,7 @@ export default class FinishCreateTs extends Vue {
     submit() {
         this.createNewWallet()
         this.setActiveAccount()
-        this.$store.commit('REMOVE_TEMPORARY_INFO')
+        this.$store.commit('REMOVE_TEMPORARY_LOGIN_INFO')
         this.$router.push('dashBoard')
     }
 

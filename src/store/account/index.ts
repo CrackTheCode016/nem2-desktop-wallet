@@ -203,7 +203,7 @@ const mutations: MutationTree<StoreAccount> = {
     SET_TEMPORARY_MNEMONIC(state: StoreAccount, mnemonic: string) {
         state.temporaryLoginInfo.mnemonic = mnemonic
     },
-    REMOVE_TEMPORARY_INFO(state: StoreAccount) {
+    REMOVE_TEMPORARY_LOGIN_INFO(state: StoreAccount) {
         state.temporaryLoginInfo = {
             password: null,
             mnemonic: null,

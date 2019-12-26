@@ -94,7 +94,7 @@ describe('FinishCreate', () => {
     }
     )
 
-    it('Clicking submit should create an AppWallet and commit REMOVE_TEMPORARY_INFO', () => {
+    it('Clicking submit should create an AppWallet and commit REMOVE_TEMPORARY_LOGIN_INFO', () => {
         const mockCommit = jest.fn()
         wrapper.vm.submit()
         expect(AppWallet).toHaveBeenCalledTimes(1)

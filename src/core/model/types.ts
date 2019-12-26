@@ -75,7 +75,6 @@ export interface LoadingOverlayObject {
     show: boolean,
     message: string,
     networkMosaics?: Record<string, AppMosaic>,
-    temporaryLoginInfo?: any
 }
 
 export interface AppInfo {

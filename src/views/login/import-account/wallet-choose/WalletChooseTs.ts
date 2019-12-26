@@ -95,7 +95,7 @@ export default class WalletChooseTs extends Vue {
             new AppWallet().createFromPath('Seed-' + item.path, new Password(password), Number(item.path), networkType, this.$store, item.balance)
         })
         localSave('activeAccountName', accountName)
-        this.$store.commit('REMOVE_TEMPORARY_INFO')
+        this.$store.commit('REMOVE_TEMPORARY_LOGIN_INFO')
         this.$router.push("finishImport")
     }
 }
