@@ -245,12 +245,11 @@ export class AppWallet {
         const accountMap = localRead('accountMap') === ''
             ? {} : JSON.parse(localRead('accountMap'))
         const newActiveWalletAddress = this.address
-        // if wallet exists ,switch to this wallet
         const localData = accountMap[accountName].wallets
         accountMap[accountName].activeWalletAddress = newActiveWalletAddress
         const flagWallet = localData.find(item => newActiveWalletAddress == item.address)  // find wallet in wallet list
-        if (flagWallet) {  // if wallet existed ,switch to this wallet
-            store.commit('SET_WALLET', flagWallet)
+        if (flagWallet) {
+            store.commit('SET_WALLET', AppWallet.createFromDTO(flagWallet))
             localSave('accountMap', JSON.stringify(accountMap))
             return
         }
@@ -281,7 +280,7 @@ export class AppWallet {
 
         if (store.state.account.wallet.address === this.address) {
             list[0].active = true
-            store.commit('SET_WALLET', list[0])
+            store.commit('SET_WALLET', AppWallet.createFromDTO(list[0]))
         }
 
         that.$Notice.success({
@@ -298,7 +297,10 @@ export class AppWallet {
 
         accountMap[accountName].activeWalletAddress = newActiveWalletAddress
         localSave('accountMap', JSON.stringify(accountMap))
-        store.commit('SET_WALLET', walletList.find(item => item.address == newActiveWalletAddress) || walletList[0])
+        const newWalletDTO = walletList
+            .find(item => item.address == newActiveWalletAddress) || walletList[0]
+        const newActiveWallet = AppWallet.createFromDTO(newWalletDTO)
+        store.commit('SET_WALLET', newActiveWallet)
     }
 
     async setAccountInfo(store: Store<AppState>): Promise<void> {
@@ -376,7 +378,9 @@ export class AppWallet {
 
         const updatedList = Object.assign([], newWalletList, {[newWalletIndex]: this})
         store.commit('SET_WALLET_LIST', updatedList)
-        if (store.state.account.wallet.address === this.address) store.commit('SET_WALLET', this)
+        if (store.state.account.wallet.address === this.address) {
+            store.commit('SET_WALLET', this)
+        }
         accountMap[accountName].wallets = updatedList
         localSave('accountMap', JSON.stringify(accountMap))
     }

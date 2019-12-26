@@ -112,7 +112,7 @@ export const AppAccounts = () => ({
             })
 
         const newWallet = accountMap[accountName].wallets.find(item => item.address == store.state.account.wallet.address)
-        store.commit('SET_WALLET', newWallet)
+        store.commit('SET_WALLET', AppWallet.createFromDTO(newWallet))
         store.commit('SET_WALLET_LIST', accountMap[accountName].wallets)
         localSave('accountMap', JSON.stringify(accountMap))
     },

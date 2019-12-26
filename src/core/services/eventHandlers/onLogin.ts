@@ -34,7 +34,7 @@ const setValuesInLocalStorage = (accountName: string, store: Store<AppState>) =>
   const accountDataFromStorage = getAccountDataFromStorage(accountName)
   const wallets = getAccountWallets(accountDataFromStorage)
   store.commit('SET_WALLET_LIST', wallets)
-  store.commit('SET_WALLET', wallets[0])
+  store.commit('SET_WALLET', AppWallet.createFromDTO(wallets[0]))
 
   store.commit(
     'SET_ACCOUNT_DATA',
