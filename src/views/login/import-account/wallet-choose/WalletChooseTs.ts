@@ -24,11 +24,11 @@ export default class WalletChooseTs extends Vue {
     }
 
     get seed(): string {
-        return this.app.loadingOverlay.temporaryInfo.mnemonic
+        return this.activeAccount.temporaryLoginInfo.mnemonic
     }
 
     get password() {
-        return this.app.loadingOverlay.temporaryInfo.password
+        return this.activeAccount.temporaryLoginInfo.password
     }
 
     get node() {
